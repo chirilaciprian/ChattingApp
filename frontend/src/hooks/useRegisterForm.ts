@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  validateEmail,
-  validatePassword,
-  validateUsername,
-  validatePasswordMatch,
-} from '../utils/validation';
 import { register as registerService } from '../services/authService';
+import { RegisterSchema } from '../schemas/auth';
+import type { ZodError } from 'zod';
 
 interface RegisterFormData {
   username: string;
@@ -63,39 +59,26 @@ export const useRegisterForm = (): UseRegisterFormReturn => {
   };
 
   const validate = (): boolean => {
-    const newErrors: Partial<Record<keyof RegisterFormData, string>> = {};
-    
-    const usernameValidation = validateUsername(formData.username);
-    if (!usernameValidation.isValid) {
-      newErrors.username = usernameValidation.error;
-    }
-    
-    const emailValidation = validateEmail(formData.email);
-    if (!emailValidation.isValid) {
-      newErrors.email = emailValidation.error;
-    }
-    
-    const passwordValidation = validatePassword(formData.password);
-    if (!passwordValidation.isValid) {
-      newErrors.password = passwordValidation.error;
-    }
-    
-    const passwordMatchValidation = validatePasswordMatch(
-      formData.password,
-      formData.confirmPassword
-    );
-    if (!passwordMatchValidation.isValid) {
-      newErrors.confirmPassword = passwordMatchValidation.error;
-    }
-    
-    if (!agreedToTerms) {
-      // This will be shown as a general error
-      alert('Please agree to the Terms and Conditions');
+    try {
+      RegisterSchema.parse(formData);
+      if (!agreedToTerms) {
+        // Show a general error by attaching to email field
+        setErrors({});
+        alert('Please agree to the Terms and Conditions');
+        return false;
+      }
+      setErrors({});
+      return true;
+    } catch (err) {
+      const zErr = err as ZodError;
+      const newErrors: Partial<Record<keyof RegisterFormData, string>> = {};
+      zErr.issues.forEach((e) => {
+        const path = e.path[0] as keyof RegisterFormData | undefined;
+        if (path) newErrors[path] = e.message;
+      });
+      setErrors(newErrors);
       return false;
     }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

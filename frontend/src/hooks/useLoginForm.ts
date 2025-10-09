@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { validateEmail, validatePassword } from '../utils/validation';
 import { login as loginService } from '../services/authService';
+import { LoginSchema } from '../schemas/auth';
+import type { ZodError } from 'zod';
 
 interface LoginFormData {
   email: string;
@@ -48,20 +49,20 @@ export const useLoginForm = (): UseLoginFormReturn => {
   };
 
   const validate = (): boolean => {
-    const newErrors: Partial<Record<keyof LoginFormData, string>> = {};
-    
-    const emailValidation = validateEmail(formData.email);
-    if (!emailValidation.isValid) {
-      newErrors.email = emailValidation.error;
+    try {
+      LoginSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (err) {
+      const zErr = err as ZodError;
+      const newErrors: Partial<Record<keyof LoginFormData, string>> = {};
+      zErr.issues.forEach((e) => {
+        const path = e.path[0] as keyof LoginFormData | undefined;
+        if (path) newErrors[path] = e.message;
+      });
+      setErrors(newErrors);
+      return false;
     }
-    
-    const passwordValidation = validatePassword(formData.password);
-    if (!passwordValidation.isValid) {
-      newErrors.password = passwordValidation.error;
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,7 +85,6 @@ export const useLoginForm = (): UseLoginFormReturn => {
         localStorage.setItem('authToken', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
         
-        // Navigate to chat
         navigate('/chat');
       } else {
         setErrors({ email: response.error || 'Login failed' });
