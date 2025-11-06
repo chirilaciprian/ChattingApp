@@ -26,6 +26,7 @@ async function bootstrap() {
       'The Chatting App API for user management and real-time chat',
     )
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

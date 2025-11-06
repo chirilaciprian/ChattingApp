@@ -4,7 +4,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -25,12 +24,12 @@ export class User {
   lastName: string;
 
   @Column()
-  @Exclude()
   password: string;
 
   @ManyToMany(() => Conversation, (conversation) => conversation.participants)
   conversations: Conversation[];
 
+  @Exclude()
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
