@@ -23,13 +23,13 @@ export class User {
   @Column()
   lastName: string;
 
+  @Exclude()
   @Column()
   password: string;
 
   @ManyToMany(() => Conversation, (conversation) => conversation.participants)
   conversations: Conversation[];
 
-  @Exclude()
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
