@@ -1,0 +1,56 @@
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+} from '@nestjs/websockets';
+import { ChatService } from './chat.service';
+import { ChatMessageDto } from './dto/chatMessage.dto';
+import { Server, Socket } from 'socket.io';
+
+@WebSocketGateway({ cors: { origin: '*' } })
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private readonly chatService: ChatService) {}
+
+  @WebSocketServer()
+  server: Server;
+
+  handleConnection(client: Socket) {
+    console.log('Client connected:', client.id);
+  }
+  handleDisconnect(client: Socket) {
+    console.log('Client disconnected:', client.id);
+  }
+
+  @SubscribeMessage('newMessage')
+  handleNewMessage(
+    @MessageBody() data: ChatMessageDto,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    console.log('New message from client', client.id, ':', data);
+    this.server.to(data.conversationId).emit('messageReceived', data);
+  }
+
+  @SubscribeMessage('joinConversation')
+  async handleJoinRoom(
+    @MessageBody() conversationId: string,
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    await client.join(conversationId);
+    console.log(`Client ${client.id} joined conversation: ${conversationId}`);
+    client.emit('conversationJoined', conversationId);
+  }
+
+  @SubscribeMessage('leaveConversation')
+  async handleLeaveRoom(
+    @MessageBody() conversationId: string,
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    await client.leave(conversationId);
+    console.log(`Client ${client.id} left conversation: ${conversationId}`);
+    client.emit('conversationLeft', conversationId);
+  }
+}

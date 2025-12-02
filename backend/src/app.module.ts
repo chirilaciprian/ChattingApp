@@ -8,6 +8,7 @@ import { ConversationModule } from './conversation/conversation.module';
 import { Message } from './message/entities/message.entity';
 import { Conversation } from './conversation/entities/conversation.entity';
 import { AuthModule } from './auth/auth.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { AuthModule } from './auth/auth.module';
     MessageModule,
     ConversationModule,
     AuthModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [],

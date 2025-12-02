@@ -4,6 +4,7 @@ import {
   ValidationArguments,
 } from 'class-validator';
 
+// Custom decorator to validate if a property matches another property's value for class-validator
 export function MatchesProperty(
   property: string,
   validationOptions?: ValidationOptions,
