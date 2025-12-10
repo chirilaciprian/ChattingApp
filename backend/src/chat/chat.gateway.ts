@@ -30,8 +30,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: ChatMessageDto,
     @ConnectedSocket() client: Socket,
   ): void {
-    console.log('New message from client', client.id, ':', data);
-    this.server.to(data.conversationId).emit('messageReceived', data);
+    const rooms = client.rooms;
+    if (!rooms.has(data.conversationId)) {
+      console.log(
+        `Client ${client.id} attempted to send message to conversation ${data.conversationId} without joining it.`,
+      );
+      return;
+    }
+    if (typeof data === 'string') {
+      data = JSON.parse(data) as ChatMessageDto;
+    }
+    console.log('Data received in gateway:', data);
+    console.log('New message from client ' + client.id + ': ' + data.message);
+    this.server.to(data.conversationId).emit('messageReceived', data.message);
   }
 
   @SubscribeMessage('joinConversation')

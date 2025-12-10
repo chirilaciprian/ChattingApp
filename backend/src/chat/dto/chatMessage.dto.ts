@@ -1,6 +1,6 @@
 export class ChatMessageDto {
-  userId: string;
+  // userId: string;
   message: string;
   conversationId: string;
-  createdAt: string;
+  // createdAt: string;
 }
