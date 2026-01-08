@@ -10,6 +10,14 @@ import {
 } from 'react-icons/hi2';
 import RegisterHero from '../components/authHeroSections/RegisterHero';
 import { useRegisterForm } from '../hooks/useRegisterForm';
+import { FcGoogle } from 'react-icons/fc';
+
+const handleGoogleSignUp = () => {
+    // Initialize Google Sign-In
+    // This will trigger Google OAuth flow
+    console.log('Google sign-up initiated');
+    // TODO: Integrate with Google OAuth library (e.g., @react-oauth/google)
+};
 
 const Register = () => {
     const {
@@ -32,11 +40,11 @@ const Register = () => {
             <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-base-100">
                 <div className="w-full max-w-md">
                     {/* Mobile Logo */}
-                        <div className="lg:hidden flex justify-center mb-8">
-                            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center">
-                                <HiChatBubbleBottomCenter className="w-8 h-8 text-white" />
-                            </div>
+                    <div className="lg:hidden flex justify-center mb-8">
+                        <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center">
+                            <HiChatBubbleBottomCenter className="w-8 h-8 text-white" />
                         </div>
+                    </div>
 
                     <div className="mb-10">
                         <h2 className="text-4xl font-bold mb-2">Create Account</h2>
@@ -175,9 +183,9 @@ const Register = () => {
                         {/* Terms and Conditions */}
                         <div className="form-control">
                             <label className="label cursor-pointer justify-start gap-2">
-                                <input 
-                                    type="checkbox" 
-                                    className="checkbox checkbox-sm checkbox-primary" 
+                                <input
+                                    type="checkbox"
+                                    className="checkbox checkbox-sm checkbox-primary"
                                     checked={agreedToTerms}
                                     onChange={(e) => setAgreedToTerms(e.target.checked)}
                                 />
@@ -191,8 +199,8 @@ const Register = () => {
                         </div>
 
                         {/* Submit Button */}
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className={`btn btn-primary w-full text-base h-12 ${isLoading ? 'loading' : ''}`}
                             disabled={isLoading}
                         >
@@ -200,7 +208,21 @@ const Register = () => {
                             {!isLoading && <HiArrowRight />}
                         </button>
                     </form>
-                    
+
+                    {/* Social Sign Up */}
+                    <div className="divider my-8">OR CONTINUE WITH</div>
+
+                    <div className="grid grid-cols-1 gap-4">
+                        <button
+                            type="button"
+                            onClick={handleGoogleSignUp}
+                            className="btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 flex items-center justify-center gap-3 h-12"
+                        >
+                            <FcGoogle className="w-5 h-5" />
+                            <span className="font-medium">Continue with Google</span>
+                        </button>
+                    </div>
+
                     <div className="text-center mt-8">
                         <p className="text-base-content/60">
                             Already have an account?{' '}
@@ -213,7 +235,7 @@ const Register = () => {
             </div>
 
             <RegisterHero />
-            
+
         </div>
     );
 };
