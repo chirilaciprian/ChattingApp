@@ -7,5 +7,5 @@ export class RegisterDto extends CreateUserDto {
     example: 'strongPassword123',
   })
   @MatchesProperty('password', { message: 'Confirm password does not match' })
-  confirm_password: string;
+  confirmPassword: string;
 }
