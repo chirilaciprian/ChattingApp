@@ -1,4 +1,4 @@
-import type { User, Message, Chat } from '../types';
+import type { User, Message, Chat } from '../types/types';
 
 // Mock current user
 export const currentUser: User = {

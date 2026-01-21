@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockChats, currentUser } from '../data/mockData';
 import { sendMessage as sendMessageService } from '../services/chatService';
-import type { Chat } from '../types';
+import type { Chat } from '../types/types';
 
 interface UseChatManagementReturn {
   chats: Chat[];

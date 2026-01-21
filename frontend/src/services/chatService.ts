@@ -3,7 +3,7 @@
  * Handles all chat-related API calls
  */
 
-import type { Chat, Message } from '../types';
+import type { Chat, Message } from '../types/types';
 
 /**
  * Fetch all chats for current user
