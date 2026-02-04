@@ -1,12 +1,16 @@
-import axios from 'axios';
+import { AxiosError } from 'axios';
 
 export const getErrorMessage = (error: unknown): string => {
-    if (axios.isAxiosError(error)) {
-        const serverMessage = error.response?.data?.message;
-        if (Array.isArray(serverMessage)) {
-            return serverMessage[0];
-        }
-        return serverMessage || "An error occurred with the request";
-    }
-    return "Unexpected error occurred";
-}
+  if (error instanceof AxiosError) {    
+    return error.response?.data?.message 
+      || error.response?.data?.error 
+      || error.message 
+      || 'Something went wrong';
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return 'An unexpected error occurred';
+};

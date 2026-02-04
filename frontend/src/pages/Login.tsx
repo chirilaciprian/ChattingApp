@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import LoginHero from '../components/authHeroSections/LoginHero';
 import { HiEnvelope, HiLockClosed, HiEye, HiChatBubbleBottomCenter, HiArrowRight } from 'react-icons/hi2';
-import { useLoginForm } from '../hooks/useLoginForm';
+import { useLogin } from '../hooks/useLogin';
 import { FcGoogle } from 'react-icons/fc';
 
 const handleGoogleLogin = () => {  
@@ -18,7 +18,7 @@ const Login = () => {
     setShowPassword,
     handleChange,
     handleSubmit,
-  } = useLoginForm();
+  } = useLogin();
 
   return (
     <div className="min-h-screen flex">

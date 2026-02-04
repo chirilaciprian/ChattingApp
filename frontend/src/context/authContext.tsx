@@ -1,0 +1,66 @@
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useEffect, useState } from "react";
+import type { LoginCredentials } from "../types/authTypes";
+import * as tokenService from "../utils/token";
+import * as authService from "../services/authService";
+import type { User } from "../types/types";
+
+type AuthContextType = {
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    token: string | null;
+    user: User | null;
+    login: (credentials: LoginCredentials) => Promise<void>;
+    logout: () => void;
+}
+
+export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+    const [token, setToken] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchUser = async () => {
+        try {
+            const userData = await authService.getMe();
+            setUser(userData);
+        } catch (error) {
+            console.log(error);
+            logout();
+        }
+    }
+
+    useEffect(() => {
+        const token = tokenService.getToken();
+        if (token) {
+            setToken(token);
+        }
+        setIsLoading(false);
+    }, []);
+
+    const login = async (credentials: LoginCredentials) => {
+        const token = await authService.loginService(credentials);
+        tokenService.setToken(token);
+        setToken(token);
+        await fetchUser();
+    }
+
+    const logout = () => {
+        tokenService.removeToken();
+        setToken(null);
+        setUser(null);
+    }
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    return (
+        <AuthContext.Provider value={{ isAuthenticated: !!token, token, user, login, logout, isLoading }}>
+            {children}
+        </AuthContext.Provider>
+    )
+};
+
+export const useAuth = () => useContext(AuthContext);
