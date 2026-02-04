@@ -4,6 +4,7 @@ import type { LoginCredentials } from "../types/authTypes";
 import * as tokenService from "../utils/token";
 import * as authService from "../services/authService";
 import type { User } from "../types/types";
+import { getErrorMessage } from "../utils/errorHandler";
 
 type AuthContextType = {
     isAuthenticated: boolean;
@@ -32,11 +33,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     useEffect(() => {
-        const token = tokenService.getToken();
-        if (token) {
-            setToken(token);
-        }
-        setIsLoading(false);
+        const initAuth = async () => {
+            const storedToken = tokenService.getToken();
+            if (storedToken) {
+                setToken(storedToken);
+                try {
+                    await fetchUser();
+                } catch (error) {
+                    console.error('Failed to restore session:', getErrorMessage(error));
+                    logout();
+                }
+            }
+            setIsLoading(false);
+        };
+        initAuth();
     }, []);
 
     const login = async (credentials: LoginCredentials) => {
