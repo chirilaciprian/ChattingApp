@@ -10,8 +10,7 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 interface JwtPayload {
   sub: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  username: string;
 }
 
 @Injectable()
@@ -26,7 +25,10 @@ export class AuthService {
   }
 
   async signin(signinDto: SigninDto): Promise<AuthResponseDto> {
-    const user = await this.validateUser(signinDto.email, signinDto.password);
+    const user = await this.validateUser(
+      signinDto.username,
+      signinDto.password,
+    );
     return await this.authenticate(user);
   }
 
@@ -34,22 +36,24 @@ export class AuthService {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      username: user.username,
     };
     return {
       token: await this.jwtService.signAsync(payload),
     };
   }
 
-  private async validateUser(email: string, password: string): Promise<User> {
-    const user = await this.userService.findOneByEmail(email);
+  private async validateUser(
+    username: string,
+    password: string,
+  ): Promise<User> {
+    const user = await this.userService.findOneByUsername(username);
     if (!user) {
-      throw new BadRequestException('Invalid credentials');
+      throw new BadRequestException('Invalid username or password');
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new BadRequestException('Invalid credentials');
+      throw new BadRequestException('Invalid username or password');
     }
     return user;
   }

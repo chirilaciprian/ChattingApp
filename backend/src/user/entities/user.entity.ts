@@ -17,11 +17,8 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  firstName: string;
-
-  @Column()
-  lastName: string;
+  @Column({ unique: true })
+  username: string;
 
   @Exclude()
   @Column()
