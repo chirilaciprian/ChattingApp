@@ -5,6 +5,7 @@ import * as tokenService from "../utils/token";
 import * as authService from "../services/authService";
 import type { User } from "../types/types";
 import { getErrorMessage } from "../utils/errorHandler";
+import Loading from "../components/common/Loading";
 
 type AuthContextType = {
     isAuthenticated: boolean;
@@ -63,7 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <Loading>Loading authentication...</Loading>;
     }
 
     return (
