@@ -17,7 +17,7 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { Message } from './entities/message.entity';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AuthGuard } from 'src/common/guards/auth.guard';
 
 @ApiBearerAuth()
 @ApiTags('Message')
