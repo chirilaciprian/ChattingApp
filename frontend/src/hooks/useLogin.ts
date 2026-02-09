@@ -11,7 +11,7 @@ export const useLogin = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<LoginCredentials>({
-    email: '',
+    username: '',
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);

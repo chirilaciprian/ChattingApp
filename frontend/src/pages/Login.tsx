@@ -4,7 +4,7 @@ import { HiEnvelope, HiLockClosed, HiEye, HiChatBubbleBottomCenter, HiArrowRight
 import { useLogin } from '../hooks/useLogin';
 import { FcGoogle } from 'react-icons/fc';
 
-const handleGoogleLogin = () => {  
+const handleGoogleLogin = () => {
   console.log('Google login initiated');
   // TODO: Integrate with Google OAuth library (e.g., @react-oauth/google)
 };
@@ -44,25 +44,25 @@ const Login = () => {
             {/* Email Input */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium">Email Address</span>
+                <span className="label-text font-medium">Username</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <HiEnvelope className="w-5 h-5 text-base-content/40" />
                 </div>
                 <input
-                  type="email"
-                  name="email"
-                  placeholder="you@example.com"
-                  className={`input input-bordered w-full pl-10 ${errors.email ? 'input-error' : ''}`}
-                  value={formData.email}
+                  type="text"
+                  name="username"
+                  placeholder="Enter your username"
+                  className={`input input-bordered w-full pl-10 ${errors.username ? 'input-error' : ''}`}
+                  value={formData.username}
                   onChange={handleChange}
                   required
                 />
               </div>
-              {errors.email && (
+              {errors.username && (
                 <label className="label">
-                  <span className="label-text-alt text-error">{errors.email}</span>
+                  <span className="label-text-alt text-error">{errors.username}</span>
                 </label>
               )}
             </div>
@@ -126,7 +126,7 @@ const Login = () => {
           <div className="divider my-8">OR CONTINUE WITH</div>
 
           <div className="grid grid-cols-1 gap-4">
-            <button 
+            <button
               type="button"
               onClick={handleGoogleLogin}
               className="btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 flex items-center justify-center gap-3 h-12"
