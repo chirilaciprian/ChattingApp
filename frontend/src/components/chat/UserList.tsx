@@ -1,4 +1,4 @@
-  import type { Chat } from '../types/types';
+  import type { Chat } from '../../types/types';
 
   interface UserListProps {
     chats: Chat[];

@@ -1,5 +1,5 @@
-import type { Message } from '../types/types';
-import { currentUser } from '../data/mockData';
+import type { Message } from '../../types/types';
+import { currentUser } from '../../data/mockData';
 
 interface MessageBubbleProps {
   message: Message;

@@ -1,6 +1,6 @@
-import UserList from '../components/UserList';
-import MessageBubble from '../components/MessageBubble';
-import MessageInput from '../components/MessageInput';
+import UserList from '../components/chat/UserList';
+import MessageBubble from '../components/chat/MessageBubble';
+import MessageInput from '../components/chat/MessageInput';
 import { useChatManagement } from '../hooks/useChatManagement';
 
 const ChatPage = () => {
