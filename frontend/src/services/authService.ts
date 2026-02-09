@@ -1,5 +1,5 @@
 import api from '../utils/axios'
-import type { LoginCredentials } from '../types/authTypes';
+import type { LoginCredentials, RegisterCredentials } from '../types/authTypes';
 
 export const loginService = async (credentials: LoginCredentials): Promise<string> => {
   const res = await api.post(`/auth/signin`, credentials);  
@@ -11,6 +11,7 @@ export const getMe = async () => {
   return res.data;
 }
 
-export const register = () => {
-
+export const register = async (credentials: RegisterCredentials): Promise<boolean> => {
+  const res = await api.post(`/auth/register`, credentials);
+  return res.status === 201;
 }

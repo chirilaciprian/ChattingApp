@@ -1,6 +1,6 @@
 export interface RegisterCredentials {
-  username: string;
   email: string;
+  username: string;
   password: string;
   confirmPassword: string;
 }

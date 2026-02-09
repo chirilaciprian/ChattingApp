@@ -9,15 +9,7 @@ import {
     HiChatBubbleBottomCenter,
 } from 'react-icons/hi2';
 import RegisterHero from '../components/authHeroSections/RegisterHero';
-import { useRegisterForm } from '../hooks/useRegisterForm';
-import { FcGoogle } from 'react-icons/fc';
-
-const handleGoogleSignUp = () => {
-    // Initialize Google Sign-In
-    // This will trigger Google OAuth flow
-    console.log('Google sign-up initiated');
-    // TODO: Integrate with Google OAuth library (e.g., @react-oauth/google)
-};
+import { useRegisterForm } from '../hooks/useRegister';
 
 const Register = () => {
     const {
@@ -188,6 +180,7 @@ const Register = () => {
                                     className="checkbox checkbox-sm checkbox-primary"
                                     checked={agreedToTerms}
                                     onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                    required
                                 />
                                 <span className="label-text">
                                     I agree to the{' '}
@@ -207,21 +200,7 @@ const Register = () => {
                             {isLoading ? 'Creating Account...' : 'Create Account'}
                             {!isLoading && <HiArrowRight />}
                         </button>
-                    </form>
-
-                    {/* Social Sign Up */}
-                    <div className="divider my-8">OR CONTINUE WITH</div>
-
-                    <div className="grid grid-cols-1 gap-4">
-                        <button
-                            type="button"
-                            onClick={handleGoogleSignUp}
-                            className="btn bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 flex items-center justify-center gap-3 h-12"
-                        >
-                            <FcGoogle className="w-5 h-5" />
-                            <span className="font-medium">Continue with Google</span>
-                        </button>
-                    </div>
+                    </form>                                        
 
                     <div className="text-center mt-8">
                         <p className="text-base-content/60">
