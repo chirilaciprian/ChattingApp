@@ -4,6 +4,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ChatPage from './pages/Chat';
 import './App.css';
+import { ProtectedRoute } from './components/routes/ProtectedRoute';
+import { PublicRoute } from './components/routes/PublicRoute';
 
 function App() {
   return (
@@ -11,9 +13,9 @@ function App() {
       <ToastContainer />
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
