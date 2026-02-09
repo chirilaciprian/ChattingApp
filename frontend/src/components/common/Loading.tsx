@@ -1,14 +1,21 @@
 import React from 'react';
 
-export default function Loading({ className = '', children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+interface LoadingProps extends React.HTMLAttributes<HTMLDivElement> {
+    children?: React.ReactNode;
+}
+
+const Loading = ({ children, className = "", ...props }: LoadingProps) => {
     return (
-        <div className={`flex flex-col items-center justify-center p-4 gap-3 ${className}`} {...props}>
+        <div
+            className={`flex flex-col items-center justify-center h-screen w-screen p-4 gap-3 ${className}`}
+            {...props}
+        >
             <span className="loading loading-spinner loading-lg text-primary"></span>
-            {children && (
-                <span className="text-sm font-semibold tracking-widest opacity-50 uppercase animate-pulse">
-                    {children}
-                </span>
-            )}
+            <span className="text-sm font-semibold tracking-widest opacity-60 uppercase animate-pulse">
+                {children || "Loading..."}
+            </span>
         </div>
     );
-}
+};
+
+export default Loading;
