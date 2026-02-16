@@ -12,6 +12,7 @@ import { ChatMessageDto } from './dto/chatMessage.dto';
 import { Server, Socket } from 'socket.io';
 import {
   ClassSerializerInterceptor,
+  Logger,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -21,16 +22,17 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 @UseGuards(AuthGuard)
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(ChatGateway.name);
   constructor(private readonly chatService: ChatService) {}
 
   @WebSocketServer()
   server: Server;
 
   handleConnection(client: Socket) {
-    console.log('Client connected:', client.id);
+    this.logger.log(`Client connected: ${client.id}`);
   }
   handleDisconnect(client: Socket) {
-    console.log('Client disconnected:', client.id);
+    this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('newMessage')
@@ -40,7 +42,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): void {
     const rooms = client.rooms;
     if (!rooms.has(data.conversationId)) {
-      console.log(
+      this.logger.warn(
         `Client ${client.id} attempted to send message to conversation ${data.conversationId} without joining it.`,
       );
       return;
@@ -48,8 +50,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (typeof data === 'string') {
       data = JSON.parse(data) as ChatMessageDto;
     }
-    console.log('Data received in gateway:', data);
-    console.log('New message from client ' + client.id + ': ' + data.message);
+    this.logger.debug(`Data received in gateway: ${JSON.stringify(data)}`);
+    this.logger.log(`New message from client ${client.id}: ${data.message}`);
     this.server.to(data.conversationId).emit('messageReceived', data.message);
   }
 
@@ -59,7 +61,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
     await client.join(conversationId);
-    console.log(`Client ${client.id} joined conversation: ${conversationId}`);
+    this.logger.log(
+      `Client ${client.id} joined conversation: ${conversationId}`,
+    );
     client.emit('conversationJoined', conversationId);
   }
 
@@ -69,7 +73,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
     await client.leave(conversationId);
-    console.log(`Client ${client.id} left conversation: ${conversationId}`);
+    this.logger.log(`Client ${client.id} left conversation: ${conversationId}`);
     client.emit('conversationLeft', conversationId);
   }
 }

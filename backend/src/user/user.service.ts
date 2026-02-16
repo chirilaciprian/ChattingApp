@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
@@ -12,6 +13,8 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
+  private readonly logger = new Logger(UserService.name);
+
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
@@ -24,6 +27,9 @@ export class UserService {
       ],
     });
     if (existingUser) {
+      this.logger.warn(
+        `Duplicate user attempt with email: ${createUserDto.email} or username: ${createUserDto.username}`,
+      );
       throw new ConflictException(
         'An user with the same email or username already exists',
       );
@@ -33,11 +39,14 @@ export class UserService {
       ...createUserDto,
       password: hashedPassword,
     });
-    return this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+    this.logger.log(`User created: ${savedUser.username} (${savedUser.id})`);
+    return savedUser;
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    const users = await this.userRepository.find();
+    return users;
   }
 
   async findOne(id: string): Promise<User> {
@@ -54,7 +63,11 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
     Object.assign(user, updateUserDto);
-    return await this.userRepository.save(user);
+    const updatedUser = await this.userRepository.save(user);
+    this.logger.log(
+      `User updated: ${updatedUser.username} (${updatedUser.id})`,
+    );
+    return updatedUser;
   }
 
   async remove(id: string): Promise<User | null> {
@@ -63,10 +76,12 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
     await this.userRepository.delete(id);
+    this.logger.log(`User deleted: ${user.username} (${user.id})`);
     return user;
   }
 
   async findOneByUsername(username: string): Promise<User | null> {
-    return await this.userRepository.findOne({ where: { username } });
+    const user = await this.userRepository.findOne({ where: { username } });
+    return user;
   }
 }

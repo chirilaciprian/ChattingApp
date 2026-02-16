@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
@@ -15,12 +15,16 @@ interface JwtPayload {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<User> {
+    this.logger.debug(
+      `Registering user with email: ${registerDto.email}  and username: ${registerDto.username}`,
+    );
     return await this.userService.create(registerDto);
   }
 
@@ -33,6 +37,7 @@ export class AuthService {
   }
 
   async authenticate(user: User): Promise<AuthResponseDto> {
+    this.logger.debug(`Authenticating user: ${user.username} (${user.id})`);
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,

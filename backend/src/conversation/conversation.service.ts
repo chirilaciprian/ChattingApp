@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateConversationDto } from './dto/create-conversation.dto';
@@ -13,6 +14,8 @@ import { Message } from 'src/message/entities/message.entity';
 
 @Injectable()
 export class ConversationService {
+  private readonly logger = new Logger(ConversationService.name);
+
   constructor(
     @InjectRepository(Conversation)
     private conversationRepository: Repository<Conversation>,
@@ -33,7 +36,10 @@ export class ConversationService {
     const conversation = this.conversationRepository.create({
       participants: users,
     });
-    return await this.conversationRepository.save(conversation);
+    const savedConversation =
+      await this.conversationRepository.save(conversation);
+    this.logger.log(`Conversation created: ${savedConversation.id}`);
+    return savedConversation;
   }
 
   async findAll(): Promise<Conversation[]> {
@@ -73,7 +79,10 @@ export class ConversationService {
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
-    return await this.conversationRepository.save(conversation);
+    const updatedConversation =
+      await this.conversationRepository.save(conversation);
+    this.logger.log(`Conversation updated: ${updatedConversation.id}`);
+    return updatedConversation;
   }
 
   async remove(id: string): Promise<Conversation> {
@@ -82,6 +91,7 @@ export class ConversationService {
       throw new NotFoundException('Conversation nout found');
     }
     await this.conversationRepository.delete(id);
+    this.logger.log(`Conversation deleted: ${conversation.id}`);
     return conversation;
   }
 }
