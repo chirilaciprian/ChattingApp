@@ -1,8 +1,7 @@
 export interface User {
-  id: string;  
+  id: string;
   email: string;
-  username: string;
-  avatar?: string;
+  username: string;  
   status?: 'online' | 'offline' | 'away';
   lastSeen?: Date;
 };
@@ -25,3 +24,18 @@ export interface Chat {
   lastMessage?: string;
   unreadCount?: number;
 };
+
+export interface Conversation {
+  id: string;
+  participants?: User[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Message {
+  id: string;
+  data: string;
+  createdBy: User;
+  isRead: boolean;
+  createdAt: Date;
+}
