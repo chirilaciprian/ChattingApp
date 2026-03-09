@@ -45,6 +45,15 @@ export class MessageController {
     return plainToInstance(Message, message);
   }
 
+  @Get('conversation/:conversationId')
+  async findByConversationId(
+    @Param('conversationId', new ParseUUIDPipe()) conversationId: string,
+  ) {
+    const messages =
+      await this.messageService.findByConversationId(conversationId);
+    return messages;
+  }
+
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,

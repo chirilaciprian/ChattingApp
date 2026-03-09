@@ -56,6 +56,12 @@ export class ConversationService {
     return conversation;
   }
 
+  async findByUserId(userId: string): Promise<Conversation[]> {
+    return await this.conversationRepository.find({
+      where: { participants: { id: userId } },
+    });
+  }
+
   async update(
     id: string,
     updateConversationDto: UpdateConversationDto,

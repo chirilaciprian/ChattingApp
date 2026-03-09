@@ -47,6 +47,12 @@ export class ConversationController {
     return plainToInstance(Conversation, conversation);
   }
 
+  @Get('user/:userId')
+  async findByUserId(@Param('userId', new ParseUUIDPipe()) userId: string) {
+    const conversations = await this.conversationService.findByUserId(userId);
+    return conversations;
+  }
+
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,

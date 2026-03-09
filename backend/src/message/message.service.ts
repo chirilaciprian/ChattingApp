@@ -51,6 +51,12 @@ export class MessageService {
     return message;
   }
 
+  async findByConversationId(conversationId: string): Promise<Message[]> {
+    return await this.messageRepository.find({
+      where: { conversation: { id: conversationId } },
+    });
+  }
+
   async update(
     id: string,
     updateMessageDto: UpdateMessageDto,
