@@ -1,2 +1,3 @@
 .vscode/settings.json
 frontend/.env
+backend/.vscode/launch.json
