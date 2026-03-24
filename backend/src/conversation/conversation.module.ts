@@ -10,5 +10,6 @@ import { Message } from 'src/message/entities/message.entity';
   imports: [TypeOrmModule.forFeature([Conversation, User, Message])],
   controllers: [ConversationController],
   providers: [ConversationService],
+  exports: [ConversationService],
 })
 export class ConversationModule {}
