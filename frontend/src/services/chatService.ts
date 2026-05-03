@@ -1,124 +1,108 @@
-import { io, Socket } from 'socket.io-client';
-import type { Conversation, Message } from '../types/types';
-export interface CreateMessageDto {
-    conversationId: string;
-    content: string;
-    senderId: string;
+import { io, Socket } from 'socket.io-client'
+import type { Conversation, CreateMessageDto, Message } from '../types/types'
+
+const GATEWAY_URL = import.meta.env.VITE_GATEWAY_URL;
+
+let socket: Socket | null = null;
+
+type SocketResponse<T = undefined> = {
+    success: boolean;
+    data?: T;
+    error?: string;
 }
 
-export interface CreateConversationDto {
-    participantIds: string[];
+type SocketEventCallbacks = {
+    onMessageReceived?: (message: Message) => void;
+    onConversationCreated?: (conversation: Conversation) => void;
+    onConversationDeleted?: (conversationId: string) => void;
+    onConversationJoined?: (conversationId: string) => void;
+    onConnectError?: (error: Error) => void;
 }
 
-type MessageHandler = (message: Message) => void;
-type ConversationHandler = (conversation: Conversation) => void;
-type StringHandler = (id: string) => void;
+export const connect = (token: string): Socket => {
+    if (socket?.connected) return socket;
+    socket = io(GATEWAY_URL, {
+        auth: {
+            token: `Bearer ${token}`
+        },
+        transports: ["websocket"],
+    });
+    return socket;
+}
 
-class ChatService {
-    private socket: Socket | null = null;
+export const disconnect = () => {
+    socket?.disconnect();
+    socket = null;
+}
 
-    connect(serverUrl: string, token: string): void {
-        if (this.socket?.connected) return;
+export const isConnected = (): boolean => {
+    return socket?.connected || false;
+}
 
-        this.socket = io(serverUrl, {
-            auth: { token: `Bearer ${token}` },
-            transports: ['websocket'],
-            reconnectionAttempts: 5,
-            reconnectionDelay: 2000,
-        });
+export const getSocket = (): Socket | null => {
+    return socket;
+}
 
-        this.socket.on('connect', () => {
-            console.log('[ChatService] Connected:', this.socket?.id);
-        });
+// listeners
 
-        this.socket.on('disconnect', (reason) => {
-            console.log('[ChatService] Disconnected:', reason);
-        });
+export const registerListeners = (callbacks: SocketEventCallbacks): void => {
+    if (!socket) return;
 
-        this.socket.on('connect_error', (err) => {
-            console.error('[ChatService] Connection error:', err.message);
-        });
+    if (callbacks.onMessageReceived) {
+        socket.on('messageReceived', (message: Message) => {
+            callbacks.onMessageReceived!(message);
+        })
     }
 
-    disconnect(): void {
-        if (this.socket) {
-            this.socket.disconnect();
-            this.socket = null;
-            console.log('[ChatService] Socket destroyed');
-        }
+    if (callbacks.onConversationCreated) {
+        socket.on('conversationCreated', callbacks.onConversationCreated);
     }
 
-    isConnected(): boolean {
-        return this.socket?.connected ?? false;
+    if (callbacks.onConversationDeleted) {
+        socket.on('conversationDeleted', callbacks.onConversationDeleted);
     }
 
-    joinConversation(conversationId: string): void {
-        this.assertConnected();
-        this.socket!.emit('joinConversation', conversationId);
+    if (callbacks.onConversationJoined) {
+        socket.on('conversationJoined', callbacks.onConversationJoined);
     }
 
-    leaveConversation(conversationId: string): void {
-        this.assertConnected();
-        this.socket!.emit('leaveConversation', conversationId);
-    }
-
-    sendMessage(message: CreateMessageDto): void {
-        this.assertConnected();
-        this.socket!.emit('newMessage', message);
-    }
-
-    createConversation(conversation: CreateConversationDto): void {
-        this.assertConnected();
-        this.socket!.emit('createConversation', conversation);
-    }
-
-    deleteConversation(conversationId: string): void {
-        this.assertConnected();
-        this.socket!.emit('deleteConversation', conversationId);
-    }
-
-    onMessageReceived(handler: MessageHandler): () => void {
-        this.assertConnected();
-        const wrapped = (raw: string | Message) => {
-            const msg: Message =
-                typeof raw === 'string' ? JSON.parse(raw) : raw;
-            handler(msg);
-        };
-        this.socket!.on('messageReceived', wrapped);
-        return () => this.socket?.off('messageReceived', wrapped);
-    }
-
-    onConversationJoined(handler: StringHandler): () => void {
-        this.assertConnected();
-        this.socket!.on('conversationJoined', handler);
-        return () => this.socket?.off('conversationJoined', handler);
-    }
-
-    onConversationLeft(handler: StringHandler): () => void {
-        this.assertConnected();
-        this.socket!.on('conversationLeft', handler);
-        return () => this.socket?.off('conversationLeft', handler);
-    }
-
-    onConversationCreated(handler: ConversationHandler): () => void {
-        this.assertConnected();
-        this.socket!.on('conversationCreated', handler);
-        return () => this.socket?.off('conversationCreated', handler);
-    }
-
-    onConversationDeleted(handler: StringHandler): () => void {
-        this.assertConnected();
-        this.socket!.on('conversationDeleted', handler);
-        return () => this.socket?.off('conversationDeleted', handler);
-    }
-
-    private assertConnected(): void {
-        if (!this.socket?.connected) {
-            throw new Error('[ChatService] Socket is not connected. Call connect() first.');
-        }
+    if (callbacks.onConnectError) {
+        socket.on('connect_error', callbacks.onConnectError);
     }
 }
 
-export type { ChatService };
+export const removeListeners = () => {
+    socket?.removeAllListeners();
+}
 
-export const chatService = new ChatService();
+// emitters
+
+export const joinConversation = (conversationId: string): Promise<SocketResponse> => {
+    return new Promise((resolve) => {
+        socket?.emit('joinConversation', conversationId, (res: SocketResponse) => resolve(res));
+    });
+}
+
+export const leaveConversation = (conversationId: string): Promise<SocketResponse> => {
+    return new Promise((resolve) => {
+        socket?.emit('leaveConversation', conversationId, (res: SocketResponse) => resolve(res));
+    });
+}
+
+export const sendMessage = (message: CreateMessageDto): Promise<SocketResponse> => {
+    return new Promise((resolve) => {
+        socket?.emit('newMessage', message, (res: SocketResponse) => resolve(res));
+    });
+}
+
+export const createConversation = (conversationId: string): Promise<SocketResponse> => {
+    return new Promise((resolve) => {
+        socket?.emit('createConversation', conversationId, (res: SocketResponse) => resolve(res));
+    });
+}
+
+export const deleteConversation = (conversationId: string): Promise<SocketResponse> => {
+    return new Promise((resolve) => {
+        socket?.emit('deleteConversation', conversationId, (res: SocketResponse) => resolve(res));
+    });
+}

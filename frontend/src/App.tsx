@@ -6,6 +6,7 @@ import Chat from './pages/Chat';
 import './App.css';
 import { ProtectedRoute } from './components/routes/ProtectedRoute';
 import { PublicRoute } from './components/routes/PublicRoute';
+import { ChatProvider } from './context/chatContext';
 
 function App() {
   return (
@@ -15,7 +16,11 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-        <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+        <Route path="/chat" element={<ProtectedRoute>
+          <ChatProvider>
+            <Chat />
+          </ChatProvider>
+        </ProtectedRoute>} />
       </Routes>
     </Router>
   );

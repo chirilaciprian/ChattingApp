@@ -20,9 +20,6 @@ interface UseRegisterFormReturn {
     handleSubmit: (e: React.FormEvent) => Promise<void>;
 }
 
-/**
- * Custom hook for registration form management
- */
 export const useRegisterForm = (): UseRegisterFormReturn => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState<RegisterCredentials>({

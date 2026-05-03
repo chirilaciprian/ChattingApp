@@ -22,3 +22,13 @@ export interface Message {
   isRead: boolean;
   createdAt: Date;
 }
+
+export interface CreateMessageDto {
+  data: string;
+  conversationId: string;
+  userId: string;
+}
+
+export interface CreateConversationDto {
+  participantIds: string[];
+}
