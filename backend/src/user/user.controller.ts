@@ -21,7 +21,7 @@ import { ApiTags } from '@nestjs/swagger';
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
@@ -36,6 +36,11 @@ export class UserController {
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return await this.userService.findOne(id);
+  }
+
+  @Get('username/:username')
+  async findByUsername(@Param('username') username: string) {
+    return await this.userService.findByUsername(username);
   }
 
   @Patch(':id')

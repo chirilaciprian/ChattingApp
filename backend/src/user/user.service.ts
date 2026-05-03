@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -17,7 +18,7 @@ export class UserService {
 
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const existingUser = await this.userRepository.findOne({
@@ -83,5 +84,19 @@ export class UserService {
   async findOneByUsername(username: string): Promise<User | null> {
     const user = await this.userRepository.findOne({ where: { username } });
     return user;
+  }
+
+  async findByUsername(username: string): Promise<User[]> {
+    if (!username || username.trim().length === 0) {
+      throw new BadRequestException('Username cannot be empty');
+    }
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .where('LOWER(user.username) LIKE LOWER(:username)', {
+        username: `%${username.trim()}%`,
+      })
+      .select(['user.id', 'user.username', 'user.email'])
+      .limit(20)
+      .getMany();
   }
 }
