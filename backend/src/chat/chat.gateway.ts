@@ -14,12 +14,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/common/guards/auth.guard';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { JwtService } from '@nestjs/jwt';
 import { CreateConversationDto } from 'src/conversation/dto/create-conversation.dto';
 import { Message } from 'src/message/entities/message.entity';
+import { Conversation } from 'src/conversation/entities/conversation.entity';
 interface JwtPayload {
   sub: string;
   email: string;
@@ -27,14 +27,13 @@ interface JwtPayload {
 }
 
 @UseInterceptors(ClassSerializerInterceptor)
-@UseGuards(AuthGuard)
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(ChatGateway.name);
   constructor(
     private readonly chatService: ChatService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   @WebSocketServer()
   server: Server;
@@ -67,66 +66,109 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleNewMessage(
     @MessageBody() message: CreateMessageDto,
     @ConnectedSocket() client: Socket,
-  ): Promise<void> {
+  ): Promise<{ success: boolean; data?: Message; error?: string }> {
     const rooms = client.rooms;
     if (!rooms.has(message.conversationId)) {
       this.logger.warn(
         `Client ${client.id} attempted to send message to conversation ${message.conversationId} without joining it.`,
       );
-      return;
+      return { success: false, error: 'Unauthorized to send message to this conversation' };
     }
     this.logger.debug(`Data received in gateway: ${JSON.stringify(message)}`);
     const newMessage: Message = await this.chatService.saveMessage(message);
     this.server
       .to(message.conversationId)
-      .emit('messageReceived', JSON.stringify(newMessage));
+      .emit('messageReceived', newMessage);
+    return {
+      success: true,
+      data: newMessage,
+    };
   }
 
   @SubscribeMessage('joinConversation')
   async handleJoinRoom(
     @MessageBody() conversationId: string,
     @ConnectedSocket() client: Socket,
-  ): Promise<void> {
-    await client.join(conversationId);
-    this.logger.log(
-      `Client ${client.id} joined conversation: ${conversationId}`,
-    );
-    client.emit('conversationJoined', conversationId);
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      await client.join(conversationId);
+      this.logger.log(
+        `Client ${client.id} joined conversation: ${conversationId}`,
+      );
+      client.emit('conversationJoined', conversationId);
+      return { success: true };
+    } catch (error) {
+      this.logger.error(`Failed to join conversation: ${error.message || 'Unknown error'}`,);
+      return {
+        success: false,
+        error: error.message || 'Unexpected error',
+      }
+    }
   }
 
   @SubscribeMessage('leaveConversation')
   async handleLeaveRoom(
     @MessageBody() conversationId: string,
     @ConnectedSocket() client: Socket,
-  ): Promise<void> {
-    await client.leave(conversationId);
-    this.logger.log(`Client ${client.id} left conversation: ${conversationId}`);
-    client.emit('conversationLeft', conversationId);
+  ): Promise<{ success: boolean; error?: string; }> {
+    try {
+      await client.leave(conversationId);
+      this.logger.log(`Client ${client.id} left conversation: ${conversationId}`);
+      client.emit('conversationLeft', conversationId);
+      return { success: true };
+    } catch (error) {
+      this.logger.error(`Failed to leave conversation: ${error.message || 'Unknown error'}`,);
+      return {
+        success: false,
+        error: error.message || 'Unexpected error',
+      }
+    }
   }
 
   @SubscribeMessage('createConversation')
   async handleCreateConversation(
     @MessageBody() conversation: CreateConversationDto,
-  ): Promise<void> {
-    const newConversation =
-      await this.chatService.createConversation(conversation);
-    newConversation.participants.forEach((participant) => {
-      this.server
-        .to(`user_${participant.id}`)
-        .emit('conversationCreated', newConversation);
-    });
+  ): Promise<{ success: boolean; data?: Conversation; error?: string }> {
+    try {
+      const newConversation =
+        await this.chatService.createConversation(conversation);
+      newConversation.participants.forEach((participant) => {
+        this.server
+          .to(`user_${participant.id}`)
+          .emit('conversationCreated', newConversation);
+      });
+      return {
+        success: true,
+        data: newConversation,
+      }
+    } catch (error) {
+      this.logger.error(`Failed to create conversation: ${error.message}`,);
+      return {
+        success: false,
+        error: error.message,
+      }
+    }
   }
 
   @SubscribeMessage('deleteConversation')
   async handleDeleteConversation(
     @MessageBody() conversationId: string,
-  ): Promise<void> {
-    const deletedConversation =
-      await this.chatService.deleteConversation(conversationId);
-    deletedConversation.participants.forEach((participant) => {
-      this.server
-        .to(`user_${participant.id}`)
-        .emit('conversationDeleted', conversationId);
-    });
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      const deletedConversation =
+        await this.chatService.deleteConversation(conversationId);
+      deletedConversation.participants.forEach((participant) => {
+        this.server
+          .to(`user_${participant.id}`)
+          .emit('conversationDeleted', conversationId);
+      });
+      return { success: true };
+    } catch (error) {
+      this.logger.error(`Failed to delete conversation: ${error.message}`,);
+      return {
+        success: false,
+        error: error.message,
+      }
+    }
   }
 }

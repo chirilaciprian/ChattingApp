@@ -16,7 +16,7 @@ export class MessageService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Conversation)
     private conversationRepository: Repository<Conversation>,
-  ) {}
+  ) { }
   async create(createMessageDto: CreateMessageDto): Promise<Message> {
     const { userId, conversationId, data } = createMessageDto;
     const createdBy = await this.userRepository.findOneBy({ id: userId });
@@ -54,6 +54,7 @@ export class MessageService {
   async findByConversationId(conversationId: string): Promise<Message[]> {
     return await this.messageRepository.find({
       where: { conversation: { id: conversationId } },
+      order: { createdAt: 'ASC' },
     });
   }
 
