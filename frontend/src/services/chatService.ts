@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client'
-import type { Conversation, CreateMessageDto, Message } from '../types/types'
+import type { Conversation, CreateMessageDto, Message, CreateConversationDto } from '../types/types'
 
 const GATEWAY_URL = import.meta.env.VITE_GATEWAY_URL;
 
@@ -95,9 +95,9 @@ export const sendMessage = (message: CreateMessageDto): Promise<SocketResponse> 
     });
 }
 
-export const createConversation = (conversationId: string): Promise<SocketResponse> => {
+export const createConversation = (dto: CreateConversationDto): Promise<SocketResponse<Conversation>> => {
     return new Promise((resolve) => {
-        socket?.emit('createConversation', conversationId, (res: SocketResponse) => resolve(res));
+        socket?.emit('createConversation', dto, (res: SocketResponse<Conversation>) => resolve(res));
     });
 }
 

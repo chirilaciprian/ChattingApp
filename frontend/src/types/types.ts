@@ -10,6 +10,8 @@ export interface User {
 export interface Conversation {
   id: string;
   participants?: User[];
+  name: string;
+  isGroup: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,4 +33,6 @@ export interface CreateMessageDto {
 
 export interface CreateConversationDto {
   participantIds: string[];
+  name: string;
+  isGroup: boolean;
 }
