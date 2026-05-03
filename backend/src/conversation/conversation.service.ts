@@ -23,7 +23,7 @@ export class ConversationService {
     private userRepository: Repository<User>,
     @InjectRepository(Message)
     private messageRepository: Repository<Message>,
-  ) {}
+  ) { }
 
   async create(
     createConversationDto: CreateConversationDto,
@@ -35,6 +35,8 @@ export class ConversationService {
     }
     const conversation = this.conversationRepository.create({
       participants: users,
+      isGroup: createConversationDto.isGroup,
+      name: createConversationDto.name,
     });
     const savedConversation =
       await this.conversationRepository.save(conversation);
@@ -81,6 +83,7 @@ export class ConversationService {
       id,
       participants: users,
       messages: messages,
+      name: updateConversationDto.name,
     });
     if (!conversation) {
       throw new NotFoundException('Conversation not found');

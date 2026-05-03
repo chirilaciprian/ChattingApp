@@ -11,13 +11,15 @@ export class ChatService {
   constructor(
     private readonly conversationService: ConversationService,
     private readonly messageService: MessageService,
-  ) {}
+  ) { }
 
   async createConversation(
     conversation: CreateConversationDto,
   ): Promise<Conversation> {
     return await this.conversationService.create({
       participantIds: conversation.participantIds,
+      isGroup: conversation.isGroup,
+      name: conversation.name,
     });
   }
 

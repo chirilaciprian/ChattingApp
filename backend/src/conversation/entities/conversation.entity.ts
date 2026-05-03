@@ -1,6 +1,7 @@
 import { Message } from 'src/message/entities/message.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   JoinTable,
@@ -23,6 +24,12 @@ export class Conversation {
     cascade: true,
   })
   messages?: Message[];
+
+  @Column({ default: false })
+  isGroup: boolean;
+
+  @Column()
+  name: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

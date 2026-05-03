@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayMinSize, IsNotEmpty, IsUUID } from 'class-validator';
+import { ArrayMinSize, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateConversationDto {
   @ApiProperty({
@@ -16,4 +16,20 @@ export class CreateConversationDto {
   @IsNotEmpty({ message: 'Participants are required' })
   @IsUUID('all', { each: true, message: 'Enter valid uuids' })
   participantIds: string[];
+
+  @ApiProperty({
+    example: false,
+    description: 'Whether the conversation is a group conversation',
+    type: Boolean,
+  })
+  isGroup: boolean;
+
+  @ApiProperty({
+    example: 'Conversation Name',
+    description: 'Name of the conversation',
+    type: String,
+  })
+  @IsNotEmpty({ message: 'Conversation name is required' })
+  @IsString()
+  name: string;
 }
