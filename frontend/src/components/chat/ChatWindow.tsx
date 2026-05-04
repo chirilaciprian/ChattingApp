@@ -4,7 +4,7 @@ import { useAuth } from '../../context/authContext';
 import MessageItem from './MessageItem';
 
 const ChatWindow: React.FC = () => {
-  const { messages, sendMessage, activeConversationId, messagesLoading } = useChat();
+  const { messages, sendMessage, activeConversation, messagesLoading } = useChat();
   const { user } = useAuth();
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -19,11 +19,11 @@ const ChatWindow: React.FC = () => {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim() || !activeConversationId || !user) return;
+    if (!inputValue.trim() || !activeConversation || !user) return;
 
     const res = await sendMessage({
       data: inputValue,
-      conversationId: activeConversationId,
+      conversationId: activeConversation.id,
       userId: user.id,
     });
 
@@ -32,7 +32,7 @@ const ChatWindow: React.FC = () => {
     }
   };
 
-  if (!activeConversationId) {
+  if (!activeConversation) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-base-100 opacity-50">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,11 +50,19 @@ const ChatWindow: React.FC = () => {
         <div className="flex items-center gap-3">
           <div className="avatar placeholder">
             <div className="bg-neutral text-neutral-content rounded-full w-10">
-              <span>C</span>
+              <span>
+                {activeConversation.isGroup
+                  ? activeConversation.name?.charAt(0).toUpperCase() || 'G'
+                  : (activeConversation.participants?.find(p => p.id !== user?.id)?.username?.charAt(0).toUpperCase() || 'C')}
+              </span>
             </div>
           </div>
           <div>
-            <h3 className="font-bold">Conversation</h3>
+            <h3 className="font-bold">
+              {activeConversation.isGroup
+                ? activeConversation.name || 'Group'
+                : (activeConversation.participants?.find(p => p.id !== user?.id)?.username || 'Conversation')}
+            </h3>
             <div className="text-xs text-success">Online</div>
           </div>
         </div>
@@ -77,7 +85,7 @@ const ChatWindow: React.FC = () => {
           <>
             {messages.map((msg, index) => {
               const isMe = msg.createdBy.id === user?.id;
-              
+
               let showAvatar = false;
               if (!isMe) {
                 const nextMsg = messages[index + 1];
@@ -98,10 +106,10 @@ const ChatWindow: React.FC = () => {
               }
 
               return (
-                <MessageItem 
-                  key={msg.id} 
-                  message={msg} 
-                  currentUser={user} 
+                <MessageItem
+                  key={msg.id}
+                  message={msg}
+                  currentUser={user}
                   showAvatar={showAvatar}
                   showDateDivider={showDateDivider}
                 />

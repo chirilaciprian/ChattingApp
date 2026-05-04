@@ -5,7 +5,7 @@ import type { Conversation } from '../../types/types';
 import CreateConversationModal from './CreateConversationModal';
 
 const ConversationList: React.FC = () => {
-  const { conversations, activeConversationId, setActiveConversation } = useChat();
+  const { conversations, activeConversation, setActiveConversation } = useChat();
   const { user } = useAuth();
 
   const [modalMode, setModalMode] = useState<'none' | 'chat' | 'group'>('none');
@@ -62,8 +62,8 @@ const ConversationList: React.FC = () => {
             {conversations.map((conv) => (
               <li key={conv.id}>
                 <button
-                  onClick={() => setActiveConversation(conv.id)}
-                  className={`flex items-center gap-3 p-4 rounded-none border-b border-base-300 ${activeConversationId === conv.id ? 'active' : ''
+                  onClick={() => setActiveConversation(conv)}
+                  className={`flex items-center gap-3 p-4 rounded-none border-b border-base-300 ${activeConversation?.id === conv.id ? 'active' : ''
                     }`}
                 >
                   <div className="avatar placeholder">

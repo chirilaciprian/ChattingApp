@@ -9,8 +9,8 @@ import type { Conversation, Message, CreateMessageDto } from '../types/types'
 type ChatContextType = {
     isConnected: boolean
     conversations: Conversation[]
-    activeConversationId: string | null
-    setActiveConversation: (id: string) => Promise<void>
+    activeConversation: Conversation | null
+    setActiveConversation: (conversation: Conversation) => Promise<void>
     messages: Message[]
     messagesLoading: boolean
     sendMessage: (dto: CreateMessageDto) => ReturnType<typeof socketService.sendMessage>
@@ -25,7 +25,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
     const [isConnected, setIsConnected] = useState(false)
     const [conversations, setConversations] = useState<Conversation[]>([])
-    const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
+    const [activeConversation, setActiveConversationState] = useState<Conversation | null>(null)
     const [messages, setMessages] = useState<Message[]>([])
     const [messagesLoading, setMessagesLoading] = useState(false)
 
@@ -45,9 +45,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             },
             onConversationDeleted: (conversationId) => {
                 setConversations(prev => prev.filter(c => c.id !== conversationId))
-                setActiveConversationId(prev => prev === conversationId ? null : prev)
+                setActiveConversationState(prev => prev?.id === conversationId ? null : prev)
                 setMessages(prev =>
-                    activeConversationId === conversationId ? [] : prev
+                    activeConversation?.id === conversationId ? [] : prev
                 )
             },
             onConnectError: (err) => {
@@ -71,19 +71,19 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     }, [user])
 
     // switch active conversation — leave old room, fetch messages, join new room
-    const setActiveConversation = useCallback(async (id: string) => {
-        if (activeConversationId) {
-            await socketService.leaveConversation(activeConversationId)
+    const setActiveConversation = useCallback(async (conversation: Conversation) => {
+        if (activeConversation) {
+            await socketService.leaveConversation(activeConversation.id)
         }
 
-        setActiveConversationId(id)
+        setActiveConversationState(conversation)
         setMessages([])
         setMessagesLoading(true)
 
         try {
             const [messages] = await Promise.all([
-                fetchMessagesByConversationId(id),
-                socketService.joinConversation(id),
+                fetchMessagesByConversationId(conversation.id),
+                socketService.joinConversation(conversation.id),
             ])
             setMessages(messages)
         } catch (err) {
@@ -91,7 +91,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         } finally {
             setMessagesLoading(false)
         }
-    }, [activeConversationId])
+    }, [activeConversation])
 
     const sendMessage = useCallback(async (dto: CreateMessageDto) => {
         const res = await socketService.sendMessage(dto)
@@ -103,7 +103,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         <ChatContext.Provider value={{
             isConnected,
             conversations,
-            activeConversationId,
+            activeConversation,
             setActiveConversation,
             messages,
             messagesLoading,
