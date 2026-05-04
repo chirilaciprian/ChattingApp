@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useChat } from '../../context/chatContext';
 import { useAuth } from '../../context/authContext';
 import type { Conversation } from '../../types/types';
@@ -23,13 +24,11 @@ const ConversationList: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-base-200 border-r border-base-300 w-80 relative">
       <div className="p-4 border-b border-base-300 flex justify-between items-center overflow-visible">
-        <div className="avatar placeholder cursor-pointer" title="Profile (Coming soon)">
+        <Link to="/profile" className="avatar placeholder cursor-pointer tooltip tooltip-bottom" data-tip="Profile">
           <div className="bg-neutral text-neutral-content rounded-full w-10 overflow-hidden flex items-end justify-center">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full translate-y-1">
-              <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
-            </svg>
+            <span className="text-xl -translate-y-1">{user?.username?.charAt(0).toUpperCase() || 'U'}</span>
           </div>
-        </div>
+        </Link>
 
         <div className="flex gap-1">
           <button

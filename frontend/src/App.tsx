@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Chat from './pages/Chat';
+import Profile from './pages/Profile';
 import './App.css';
 import { ProtectedRoute } from './components/routes/ProtectedRoute';
 import { PublicRoute } from './components/routes/PublicRoute';
@@ -20,6 +21,9 @@ function App() {
           <ChatProvider>
             <Chat />
           </ChatProvider>
+        </ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute>
+          <Profile />
         </ProtectedRoute>} />
       </Routes>
     </Router>

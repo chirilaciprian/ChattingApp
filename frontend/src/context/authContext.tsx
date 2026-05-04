@@ -14,6 +14,7 @@ type AuthContextType = {
     user: User | null;
     login: (credentials: LoginCredentials) => Promise<void>;
     logout: () => void;
+    updateUserLocal: (user: User) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -63,12 +64,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
     }
 
+    const updateUserLocal = (updatedUser: User) => {
+        setUser(updatedUser);
+    }
+
     if (isLoading) {
         return <Loading>Loading authentication...</Loading>;
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated: !!token, token, user, login, logout, isLoading }}>
+        <AuthContext.Provider value={{ isAuthenticated: !!token, token, user, login, logout, isLoading, updateUserLocal }}>
             {children}
         </AuthContext.Provider>
     )
