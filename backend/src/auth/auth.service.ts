@@ -11,6 +11,7 @@ interface JwtPayload {
   sub: string;
   email: string;
   username: string;
+  createdAt: Date;
 }
 
 @Injectable()
@@ -19,7 +20,7 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto): Promise<User> {
     this.logger.debug(
@@ -37,11 +38,12 @@ export class AuthService {
   }
 
   async authenticate(user: User): Promise<AuthResponseDto> {
-    this.logger.debug(`Authenticating user: ${user.username} (${user.id})`);
+    this.logger.log(`Authenticating user: ${user.username} (${user.id})`);
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
       username: user.username,
+      createdAt: user.createdAt,
     };
     return {
       token: await this.jwtService.signAsync(payload),

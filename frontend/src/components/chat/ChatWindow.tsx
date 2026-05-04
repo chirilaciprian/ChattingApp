@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { HiChatBubbleOvalLeft, HiPaperAirplane } from 'react-icons/hi2';
 import { useChat } from '../../context/chatContext';
 import { useAuth } from '../../context/authContext';
 import MessageItem from './MessageItem';
@@ -9,35 +10,20 @@ const ChatWindow: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  useEffect(() => { scrollToBottom(); }, [messages]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || !activeConversation || !user) return;
-
-    const res = await sendMessage({
-      data: inputValue,
-      conversationId: activeConversation.id,
-      userId: user.id,
-    });
-
-    if (res.success) {
-      setInputValue('');
-    }
+    const res = await sendMessage({ data: inputValue, conversationId: activeConversation.id, userId: user.id });
+    if (res.success) setInputValue('');
   };
 
   if (!activeConversation) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-base-100 opacity-50">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
+        <HiChatBubbleOvalLeft className="h-16 w-16 mb-4" />
         <p className="text-xl">Select a conversation to start chatting</p>
       </div>
     );
@@ -53,7 +39,7 @@ const ChatWindow: React.FC = () => {
               <span>
                 {activeConversation.isGroup
                   ? activeConversation.name?.charAt(0).toUpperCase() || 'G'
-                  : (activeConversation.participants?.find(p => p.id !== user?.id)?.username?.charAt(0).toUpperCase() || 'C')}
+                  : activeConversation.participants?.find(p => p.id !== user?.id)?.username?.charAt(0).toUpperCase() || 'C'}
               </span>
             </div>
           </div>
@@ -61,15 +47,10 @@ const ChatWindow: React.FC = () => {
             <h3 className="font-bold">
               {activeConversation.isGroup
                 ? activeConversation.name || 'Group'
-                : (activeConversation.participants?.find(p => p.id !== user?.id)?.username || 'Conversation')}
+                : activeConversation.participants?.find(p => p.id !== user?.id)?.username || 'Conversation'}
             </h3>
             <div className="text-xs text-success">Online</div>
           </div>
-        </div>
-        <div className="flex gap-2">
-          {/* <button className="btn btn-ghost btn-circle btn-sm">
-
-          </button> */}
         </div>
       </div>
 
@@ -77,40 +58,27 @@ const ChatWindow: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {messagesLoading ? (
           <div className="flex justify-center items-center h-full">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
+            <span className="loading loading-spinner loading-lg text-primary" />
           </div>
         ) : (
           <>
             {messages.map((msg, index) => {
               const isMe = msg.createdBy.id === user?.id;
-
               let showAvatar = false;
               if (!isMe) {
                 const nextMsg = messages[index + 1];
-                if (!nextMsg || nextMsg.createdBy.id !== msg.createdBy.id) {
-                  showAvatar = true;
-                }
+                if (!nextMsg || nextMsg.createdBy.id !== msg.createdBy.id) showAvatar = true;
               }
-
               let showDateDivider = false;
               const prevMsg = messages[index - 1];
               if (!prevMsg) {
                 showDateDivider = true;
               } else {
                 const timeDiff = new Date(msg.createdAt).getTime() - new Date(prevMsg.createdAt).getTime();
-                if (timeDiff > 10 * 60 * 1000) { // 10 minutes
-                  showDateDivider = true;
-                }
+                if (timeDiff > 10 * 60 * 1000) showDateDivider = true;
               }
-
               return (
-                <MessageItem
-                  key={msg.id}
-                  message={msg}
-                  currentUser={user}
-                  showAvatar={showAvatar}
-                  showDateDivider={showDateDivider}
-                />
+                <MessageItem key={msg.id} message={msg} currentUser={user} showAvatar={showAvatar} showDateDivider={showDateDivider} />
               );
             })}
             <div ref={messagesEndRef} />
@@ -128,9 +96,7 @@ const ChatWindow: React.FC = () => {
           onChange={(e) => setInputValue(e.target.value)}
         />
         <button type="submit" className="btn btn-primary" disabled={!inputValue.trim()}>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
+          <HiPaperAirplane className="h-6 w-6" />
         </button>
       </form>
     </div>

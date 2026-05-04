@@ -9,16 +9,17 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   ParseUUIDPipe,
-  // UseGuards,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
-// import { AuthGuard } from 'src/common/guards/auth.guard';
+import { AuthGuard } from 'src/common/guards/auth.guard';
 
 @ApiTags('User')
 @UseInterceptors(ClassSerializerInterceptor)
+@UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) { }

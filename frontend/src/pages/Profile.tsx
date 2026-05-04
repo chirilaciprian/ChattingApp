@@ -30,6 +30,7 @@ const Profile: React.FC = () => {
     }
   };
 
+  console.log(user);
   const formattedDate = new Date(user.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -39,7 +40,7 @@ const Profile: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col bg-base-100 h-full overflow-y-auto">
       <div className="p-4 border-b border-base-300 flex items-center bg-base-100/80 backdrop-blur sticky top-0 z-10">
-        <button 
+        <button
           className="btn btn-ghost btn-sm btn-circle mr-3"
           onClick={() => navigate('/chat')}
         >
@@ -74,7 +75,7 @@ const Profile: React.FC = () => {
                   disabled={!isEditing || isLoading}
                 />
               </div>
-              
+
               <div>
                 <label className="label pb-1">
                   <span className="label-text font-medium">Email</span>
@@ -92,8 +93,8 @@ const Profile: React.FC = () => {
             <div className="w-full flex justify-end gap-2 mt-6">
               {isEditing ? (
                 <>
-                  <button 
-                    className="btn btn-ghost" 
+                  <button
+                    className="btn btn-neutral px-8 w-1/2"
                     onClick={() => {
                       setUsername(user.username);
                       setEmail(user.email);
@@ -103,8 +104,8 @@ const Profile: React.FC = () => {
                   >
                     Cancel
                   </button>
-                  <button 
-                    className="btn btn-primary px-8" 
+                  <button
+                    className="btn btn-primary px-8 w-1/2"
                     onClick={handleSave}
                     disabled={isLoading}
                   >
@@ -112,19 +113,19 @@ const Profile: React.FC = () => {
                   </button>
                 </>
               ) : (
-                <button 
-                  className="btn btn-primary w-full" 
+                <button
+                  className="btn btn-primary w-full"
                   onClick={() => setIsEditing(true)}
                 >
                   Edit Profile
                 </button>
               )}
             </div>
-            
+
             <div className="divider my-4 w-full"></div>
-            
-            <button 
-              className="btn btn-error btn-outline w-full" 
+
+            <button
+              className="btn btn-outline btn-error w-full"
               onClick={logout}
             >
               Logout
