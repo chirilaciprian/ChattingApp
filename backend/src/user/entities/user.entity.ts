@@ -20,6 +20,9 @@ export class User {
   @Column({ unique: true })
   username: string;
 
+  @Column({ nullable: true })
+  avatarUrl?: string;
+
   @Exclude()
   @Column()
   password: string;

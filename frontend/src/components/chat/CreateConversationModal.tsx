@@ -4,6 +4,7 @@ import { useChat } from '../../context/chatContext';
 import { useAuth } from '../../context/authContext';
 import type { User } from '../../types/types';
 import { searchUserByUsername } from '../../services/userService';
+import Avatar from '../common/Avatar';
 
 interface CreateConversationModalProps {
   isOpen: boolean;
@@ -97,11 +98,7 @@ const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ isOpe
                     className={`flex items-center gap-3 ${selectedUsers.find(su => su.id === u.id) ? 'active' : ''}`}
                     onClick={() => toggleUserSelection(u)}
                   >
-                    <div className="avatar placeholder">
-                      <div className="bg-neutral text-neutral-content rounded-full w-8 h-8">
-                        <span>{u.username.charAt(0).toUpperCase()}</span>
-                      </div>
-                    </div>
+                    <Avatar url={u.avatarUrl} name={u.username} size="sm" />
                     {u.username}
                   </button>
                 </li>
@@ -123,4 +120,4 @@ const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ isOpe
   );
 };
 
-export default CreateConversationModal;
+export default CreateConversationModal; 

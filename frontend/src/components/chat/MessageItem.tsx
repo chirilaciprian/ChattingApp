@@ -1,6 +1,7 @@
 import React from 'react';
-import { HiUser } from 'react-icons/hi2';
+
 import type { Message, User } from '../../types/types';
+import Avatar from '../common/Avatar';
 
 
 interface MessageItemProps {
@@ -54,13 +55,11 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, currentUser, showAva
       )}
       <div className={`chat group ${isMe ? 'chat-end' : 'chat-start'}`}>
         {!isMe && (
-          <div className="chat-image avatar">
+          <div className="chat-image">
             {showAvatar ? (
-              <div className="w-10 rounded-full bg-base-300 text-base-content/50 overflow-hidden flex items-end justify-center">
-                <HiUser className="w-full h-full translate-y-1" />
-              </div>
+              <Avatar url={message.createdBy.avatarUrl} name={message.createdBy.username} size="sm" />
             ) : (
-              <div className="w-10" />
+              <div className="w-8" />
             )}
           </div>
         )}

@@ -3,6 +3,7 @@ import { HiChatBubbleOvalLeft, HiPaperAirplane } from 'react-icons/hi2';
 import { useChat } from '../../context/chatContext';
 import { useAuth } from '../../context/authContext';
 import MessageItem from './MessageItem';
+import Avatar from '../common/Avatar';
 
 const ChatWindow: React.FC = () => {
   const { messages, sendMessage, activeConversation, messagesLoading } = useChat();
@@ -34,15 +35,12 @@ const ChatWindow: React.FC = () => {
       {/* Header */}
       <div className="p-4 border-b border-base-300 flex items-center justify-between bg-base-100/80 backdrop-blur z-10">
         <div className="flex items-center gap-3">
-          <div className="avatar placeholder">
-            <div className="bg-neutral text-neutral-content rounded-full w-10">
-              <span>
-                {activeConversation.isGroup
-                  ? activeConversation.name?.charAt(0).toUpperCase() || 'G'
-                  : activeConversation.participants?.find(p => p.id !== user?.id)?.username?.charAt(0).toUpperCase() || 'C'}
-              </span>
-            </div>
-          </div>
+          <Avatar 
+            url={activeConversation.isGroup ? undefined : activeConversation.participants?.find(p => p.id !== user?.id)?.avatarUrl}
+            name={activeConversation.isGroup 
+              ? activeConversation.name || 'Group' 
+              : activeConversation.participants?.find(p => p.id !== user?.id)?.username || 'Conversation'} 
+          />
           <div>
             <h3 className="font-bold">
               {activeConversation.isGroup
