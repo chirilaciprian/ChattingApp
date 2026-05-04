@@ -45,12 +45,15 @@ export class ConversationService {
   }
 
   async findAll(): Promise<Conversation[]> {
-    return await this.conversationRepository.find();
+    return await this.conversationRepository.find({
+      relations: ['participants'],
+    });
   }
 
   async findOne(id: string): Promise<Conversation> {
     const conversation = await this.conversationRepository.findOne({
       where: { id },
+      relations: ['participants'],
     });
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
@@ -59,9 +62,11 @@ export class ConversationService {
   }
 
   async findByUserId(userId: string): Promise<Conversation[]> {
-    return await this.conversationRepository.find({
-      where: { participants: { id: userId } },
-    });
+    return await this.conversationRepository
+      .createQueryBuilder('conversation')
+      .innerJoin('conversation.participants', 'filterUser', 'filterUser.id = :userId', { userId })
+      .leftJoinAndSelect('conversation.participants', 'participants')
+      .getMany();
   }
 
   async update(

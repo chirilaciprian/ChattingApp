@@ -33,6 +33,6 @@ export interface CreateMessageDto {
 
 export interface CreateConversationDto {
   participantIds: string[];
-  name: string;
+  name: string | null;
   isGroup: boolean;
 }

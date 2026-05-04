@@ -13,7 +13,7 @@ interface CreateConversationModalProps {
 const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ isOpen, mode, onClose }) => {
   const { createConversation } = useChat();
   const { user } = useAuth();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
@@ -60,11 +60,11 @@ const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ isOpe
   const handleCreate = async () => {
     if (selectedUsers.length === 0 || !user) return;
     if (mode === 'group' && !groupName.trim()) return;
-    
+
     const participantIds = [user.id, ...selectedUsers.map(u => u.id)];
     const isGroup = mode === 'group';
-    const name = isGroup ? groupName.trim() : selectedUsers[0].username;
-    
+    const name = isGroup ? groupName.trim() : null;
+
     try {
       const res = await createConversation({ participantIds, name, isGroup });
       if (res.success) {
@@ -82,12 +82,12 @@ const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ isOpe
           <h3 className="font-bold text-lg">{mode === 'group' ? 'New Group' : 'New Chat'}</h3>
           <button className="btn btn-sm btn-circle btn-ghost" onClick={onClose}>✕</button>
         </div>
-        
+
         {mode === 'group' && (
-          <input 
-            type="text" 
-            placeholder="Group Name" 
-            className="input input-bordered w-full" 
+          <input
+            type="text"
+            placeholder="Group Name"
+            className="input input-bordered w-full"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
             autoFocus
@@ -99,8 +99,8 @@ const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ isOpe
             {selectedUsers.map(su => (
               <div key={su.id} className="badge badge-primary gap-1 p-3">
                 {su.username}
-                <button 
-                  onClick={() => toggleUserSelection(su)} 
+                <button
+                  onClick={() => toggleUserSelection(su)}
                   className="hover:text-error rounded-full w-4 h-4 flex items-center justify-center"
                 >✕</button>
               </div>
@@ -108,15 +108,15 @@ const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ isOpe
           </div>
         )}
 
-        <input 
-          type="text" 
-          placeholder="Search username..." 
-          className="input input-bordered w-full" 
+        <input
+          type="text"
+          placeholder="Search username..."
+          className="input input-bordered w-full"
           value={searchQuery}
           onChange={handleSearch}
           autoFocus={mode !== 'group'}
         />
-        
+
         <div className="flex-1 overflow-y-auto max-h-48 border border-base-300 rounded-box p-2">
           {searchResults.length === 0 && searchQuery.length > 0 ? (
             <div className="text-center opacity-50 py-4">No users found</div>
@@ -126,7 +126,7 @@ const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ isOpe
             <ul className="menu p-0">
               {searchResults.map(u => (
                 <li key={u.id}>
-                  <button 
+                  <button
                     className={`flex items-center gap-3 ${selectedUsers.find(su => su.id === u.id) ? 'active' : ''}`}
                     onClick={() => toggleUserSelection(u)}
                   >
@@ -145,9 +145,9 @@ const CreateConversationModal: React.FC<CreateConversationModalProps> = ({ isOpe
 
         <div className="flex justify-end gap-2 mt-2">
           <button className="btn" onClick={onClose}>Cancel</button>
-          <button 
-            className="btn btn-primary" 
-            disabled={selectedUsers.length === 0 || (mode === 'group' && !groupName.trim())} 
+          <button
+            className="btn btn-primary"
+            disabled={selectedUsers.length === 0 || (mode === 'group' && !groupName.trim())}
             onClick={handleCreate}
           >
             Create {mode === 'group' ? 'Group' : 'Chat'}

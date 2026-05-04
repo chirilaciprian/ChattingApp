@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateConversationDto } from './create-conversation.dto';
-import { IsUUID } from 'class-validator';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class UpdateConversationDto extends CreateConversationDto {
   @ApiProperty({

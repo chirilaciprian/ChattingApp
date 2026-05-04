@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayMinSize, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { ArrayMinSize, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateConversationDto {
   @ApiProperty({
@@ -29,7 +29,8 @@ export class CreateConversationDto {
     description: 'Name of the conversation',
     type: String,
   })
-  @IsNotEmpty({ message: 'Conversation name is required' })
+
+  @IsOptional()
   @IsString()
   name: string;
 }

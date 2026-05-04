@@ -28,8 +28,8 @@ export class Conversation {
   @Column({ default: false })
   isGroup: boolean;
 
-  @Column()
-  name: string;
+  @Column({ nullable: true })
+  name?: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
