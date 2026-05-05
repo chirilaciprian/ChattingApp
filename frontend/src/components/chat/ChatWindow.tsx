@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { HiChatBubbleOvalLeft, HiPaperAirplane } from 'react-icons/hi2';
+import { HiChatBubbleOvalLeft, HiPaperAirplane, HiEllipsisVertical, HiPencil } from 'react-icons/hi2';
 import { useChat } from '../../context/chatContext';
 import { useAuth } from '../../context/authContext';
+import { useNavigate } from 'react-router-dom';
 import MessageItem from './MessageItem';
 import Avatar from '../common/Avatar';
 
 const ChatWindow: React.FC = () => {
   const { messages, sendMessage, activeConversation, messagesLoading } = useChat();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -35,11 +37,11 @@ const ChatWindow: React.FC = () => {
       {/* Header */}
       <div className="p-4 border-b border-base-300 flex items-center justify-between bg-base-100/80 backdrop-blur z-10">
         <div className="flex items-center gap-3">
-          <Avatar 
-            url={activeConversation.isGroup ? undefined : activeConversation.participants?.find(p => p.id !== user?.id)?.avatarUrl}
-            name={activeConversation.isGroup 
-              ? activeConversation.name || 'Group' 
-              : activeConversation.participants?.find(p => p.id !== user?.id)?.username || 'Conversation'} 
+          <Avatar
+            url={activeConversation.isGroup ? activeConversation.avatarUrl : activeConversation.participants?.find(p => p.id !== user?.id)?.avatarUrl}
+            name={activeConversation.isGroup
+              ? activeConversation.name || 'Group'
+              : activeConversation.participants?.find(p => p.id !== user?.id)?.username || 'Conversation'}
           />
           <div>
             <h3 className="font-bold">
@@ -50,6 +52,15 @@ const ChatWindow: React.FC = () => {
             <div className="text-xs text-success">Online</div>
           </div>
         </div>
+
+        {activeConversation.isGroup && (
+          <button
+            onClick={() => navigate(`/group/${activeConversation.id}`)}
+            className="btn btn-ghost btn-circle"
+          >
+            <HiPencil className="h-6 w-6" />
+          </button>
+        )}
       </div>
 
       {/* Messages */}

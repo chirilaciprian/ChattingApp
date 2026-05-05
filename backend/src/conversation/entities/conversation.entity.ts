@@ -31,6 +31,9 @@ export class Conversation {
   @Column({ nullable: true })
   name?: string;
 
+  @Column({ nullable: true })
+  avatarUrl?: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

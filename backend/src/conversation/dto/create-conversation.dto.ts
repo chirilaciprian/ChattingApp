@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayMinSize, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { ArrayMinSize, IsBoolean, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateConversationDto {
   @ApiProperty({
@@ -22,6 +22,7 @@ export class CreateConversationDto {
     description: 'Whether the conversation is a group conversation',
     type: Boolean,
   })
+  @IsBoolean()
   isGroup: boolean;
 
   @ApiProperty({
@@ -33,4 +34,5 @@ export class CreateConversationDto {
   @IsOptional()
   @IsString()
   name: string;
+
 }

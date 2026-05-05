@@ -22,8 +22,8 @@ const ConversationList: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-base-200 border-r border-base-300 w-80 relative">
-      <div className="p-4 border-b border-base-300 flex justify-between items-center overflow-visible">
+    <div className="flex flex-col h-full bg-base-200 border-r border-base-300 w-80">
+      <div className="p-4 border-b border-base-300 flex justify-between items-center">
         <Link to="/profile" className="cursor-pointer tooltip tooltip-bottom" data-tip="Profile">
           <Avatar url={user?.avatarUrl} name={user?.username || 'U'} />
         </Link>
@@ -49,39 +49,38 @@ const ConversationList: React.FC = () => {
         {conversations.length === 0 ? (
           <div className="p-4 text-center opacity-50">No conversations yet</div>
         ) : (
-          <ul className="menu w-full p-0">
+          <div className="flex flex-col">
             {conversations.map((conv) => (
-              <li key={conv.id}>
-                <button
-                  onClick={() => setActiveConversation(conv)}
-                  className={`flex items-center gap-3 p-4 rounded-none border-b border-base-300 ${activeConversation?.id === conv.id ? 'active' : ''}`}
-                >
+              <button
+                key={conv.id}
+                onClick={() => setActiveConversation(conv)}
+                className={`flex items-center gap-3 p-4 border-b border-base-300 hover:bg-base-300 transition-colors text-left w-full cursor-pointer ${activeConversation?.id === conv.id ? 'bg-base-300' : ''}`}
+              >
+                <div className="shrink-0">
                   {conv.isGroup ? (
-                    // Group: use avatar-group when no group image is set
                     <Avatar
                       isGroup
-                      url={conv.avatarUrl}           // if the group has a custom image, it shows normally
+                      url={conv.avatarUrl}
                       name={getConversationName(conv)}
                       size="lg"
                       participants={conv.participants ?? []}
                       currentUserId={user?.id}
                     />
                   ) : (
-                    // 1-on-1: show the other participant's avatar
                     <Avatar
                       url={conv.participants?.find(p => p.id !== user?.id)?.avatarUrl}
                       name={getConversationName(conv)}
                       size="lg"
                     />
                   )}
-                  <div className="flex-1 text-left">
-                    <div className="font-bold truncate">{getConversationName(conv)}</div>
-                    <div className="text-xs opacity-60 truncate">Click to chat</div>
-                  </div>
-                </button>
-              </li>
+                </div>
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span className="font-bold truncate">{getConversationName(conv)}</span>
+                  <span className="text-xs opacity-60 truncate">Click to chat</span>
+                </div>
+              </button>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 

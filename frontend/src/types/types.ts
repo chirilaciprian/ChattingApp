@@ -38,3 +38,10 @@ export interface CreateConversationDto {
   name: string | null;
   isGroup: boolean;
 }
+
+export interface UpdateConversationDto {
+  participantIds: string[];
+  name?: string | null;
+  isGroup: boolean;
+  avatarUrl?: string | null;
+}

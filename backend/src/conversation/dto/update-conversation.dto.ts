@@ -1,16 +1,14 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateConversationDto } from './create-conversation.dto';
-import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
-export class UpdateConversationDto extends CreateConversationDto {
+export class UpdateConversationDto extends PartialType(CreateConversationDto) {
   @ApiProperty({
-    example: [
-      '550e8400-e29b-41d4-a716-446655440000',
-      '550e8400-e29b-41d4-a716-446655440001',
-    ],
-    description: 'Array of message IDs',
-    type: [String],
+    example: 'https://example.com/avatar.png',
+    description: 'Avatar URL of the conversation',
+    type: String,
   })
-  @IsUUID('all', { each: true, message: 'Enter valid uuids' })
-  messageIds: string[];
+  @IsOptional()
+  @IsString()
+  avatarUrl: string;
 }

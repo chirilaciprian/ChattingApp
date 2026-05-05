@@ -73,23 +73,23 @@ export class ConversationService {
     id: string,
     updateConversationDto: UpdateConversationDto,
   ): Promise<Conversation> {
-    const { participantIds, messageIds } = updateConversationDto;
-    const users = await this.userRepository.findBy({ id: In(participantIds) });
-    if (users.length !== participantIds.length) {
-      throw new BadRequestException('One or more users not found');
+    const { participantIds, name, isGroup, avatarUrl } = updateConversationDto;
+    let users: User[] | undefined;
+    if (participantIds) {
+      users = await this.userRepository.findBy({ id: In(participantIds) });
+      if (users.length !== participantIds.length) {
+        throw new BadRequestException('One or more users not found');
+      }
     }
-    const messages = await this.messageRepository.findBy({
-      id: In(messageIds),
-    });
-    if (messages.length !== messageIds.length) {
-      throw new BadRequestException('One or more messages not found');
-    }
+
     const conversation = await this.conversationRepository.preload({
       id,
-      participants: users,
-      messages: messages,
-      name: updateConversationDto.name,
+      ...(users && { participants: users }),
+      ...(name !== undefined && { name }),
+      ...(isGroup !== undefined && { isGroup }),
+      ...(avatarUrl !== undefined && { avatarUrl }),
     });
+
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }

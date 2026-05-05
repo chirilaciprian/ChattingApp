@@ -8,6 +8,7 @@ import './App.css';
 import { ProtectedRoute } from './components/routes/ProtectedRoute';
 import { PublicRoute } from './components/routes/PublicRoute';
 import { ChatProvider } from './context/chatContext';
+import ConversationSettings from './pages/ConversationSettings';
 
 function App() {
   return (
@@ -20,6 +21,11 @@ function App() {
         <Route path="/chat" element={<ProtectedRoute>
           <ChatProvider>
             <Chat />
+          </ChatProvider>
+        </ProtectedRoute>} />
+        <Route path="/group/:id" element={<ProtectedRoute>
+          <ChatProvider>
+            <ConversationSettings />
           </ChatProvider>
         </ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute>

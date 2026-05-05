@@ -11,6 +11,7 @@ type ChatContextType = {
     conversations: Conversation[]
     activeConversation: Conversation | null
     setActiveConversation: (conversation: Conversation) => Promise<void>
+    updateConversationLocal: (updated: Conversation) => void
     messages: Message[]
     messagesLoading: boolean
     sendMessage: (dto: CreateMessageDto) => ReturnType<typeof socketService.sendMessage>
@@ -93,6 +94,11 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [activeConversation])
 
+    const updateConversationLocal = useCallback((updated: Conversation) => {
+        setConversations(prev => prev.map(c => c.id === updated.id ? updated : c))
+        setActiveConversationState(prev => prev?.id === updated.id ? updated : prev)
+    }, [])
+
     const sendMessage = useCallback(async (dto: CreateMessageDto) => {
         const res = await socketService.sendMessage(dto)
         if (!res.success) console.error('Failed to send message:', res.error)
@@ -105,6 +111,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             conversations,
             activeConversation,
             setActiveConversation,
+            updateConversationLocal,
             messages,
             messagesLoading,
             sendMessage,
