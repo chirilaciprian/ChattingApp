@@ -57,19 +57,26 @@ const Profile: React.FC = () => {
       <div className="flex-1 p-6 flex justify-center items-start">
         <div className="card w-full max-w-md bg-base-200 shadow-md">
           <div className="card-body items-center text-center">
-            
-            <div className="relative mb-4 group inline-block">
-              <Avatar url={avatarUrl} name={username} size="xl" className="shadow-sm" />
+
+            <div
+              className={`relative mb-4 group inline-block rounded-full transition-all duration-200
+                ${isEditing ? 'opacity-70 saturate-70' : ''}
+              `}
+            >
+              <Avatar url={avatarUrl} name={username} size="xxl" />
+
               {isEditing && (
-                <div 
+                <div
                   className="absolute inset-0 bg-base-300/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10"
                   onClick={() => setShowAvatarSelector(true)}
                 >
-                   <span className="text-sm font-bold text-base-content backdrop-blur-sm px-2 py-1 rounded-md">Change</span>
+                  <span className="text-sm font-bold text-base-content backdrop-blur-sm px-2 py-1 rounded-md">
+                    Change
+                  </span>
                 </div>
               )}
             </div>
-            
+
             <h2 className="card-title text-2xl">{user.username}</h2>
             <p className="text-sm opacity-70 mb-6">Member since {formattedDate}</p>
 
@@ -150,17 +157,17 @@ const Profile: React.FC = () => {
         <div className="modal modal-open">
           <div className="modal-box max-w-2xl">
             <h3 className="font-bold text-lg mb-4">Select an Avatar</h3>
-            
+
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-4 max-h-[60vh] overflow-y-auto p-2">
-              <div 
+              <div
                 className={`cursor-pointer rounded-full p-1 border-2 transition-all ${!avatarUrl ? 'border-primary scale-110 shadow-md' : 'border-transparent hover:border-base-300'}`}
                 onClick={() => setAvatarUrl('')}
               >
                 <Avatar name={username} size="lg" />
               </div>
               {AVATARS.map((url, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className={`cursor-pointer rounded-full p-1 border-2 transition-all ${avatarUrl === url ? 'border-primary scale-110 shadow-md' : 'border-transparent hover:border-base-300'}`}
                   onClick={() => setAvatarUrl(url)}
                 >
@@ -168,7 +175,7 @@ const Profile: React.FC = () => {
                 </div>
               ))}
             </div>
-            
+
             <div className="modal-action mt-6">
               <button className="btn btn-primary" onClick={() => setShowAvatarSelector(false)}>Done</button>
             </div>

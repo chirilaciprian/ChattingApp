@@ -56,11 +56,24 @@ const ConversationList: React.FC = () => {
                   onClick={() => setActiveConversation(conv)}
                   className={`flex items-center gap-3 p-4 rounded-none border-b border-base-300 ${activeConversation?.id === conv.id ? 'active' : ''}`}
                 >
-                  <Avatar
-                    url={conv.isGroup ? undefined : conv.participants?.find(p => p.id !== user?.id)?.avatarUrl}
-                    name={getConversationName(conv)}
-                    size="lg"
-                  />
+                  {conv.isGroup ? (
+                    // Group: use avatar-group when no group image is set
+                    <Avatar
+                      isGroup
+                      url={conv.avatarUrl}           // if the group has a custom image, it shows normally
+                      name={getConversationName(conv)}
+                      size="lg"
+                      participants={conv.participants ?? []}
+                      currentUserId={user?.id}
+                    />
+                  ) : (
+                    // 1-on-1: show the other participant's avatar
+                    <Avatar
+                      url={conv.participants?.find(p => p.id !== user?.id)?.avatarUrl}
+                      name={getConversationName(conv)}
+                      size="lg"
+                    />
+                  )}
                   <div className="flex-1 text-left">
                     <div className="font-bold truncate">{getConversationName(conv)}</div>
                     <div className="text-xs opacity-60 truncate">Click to chat</div>

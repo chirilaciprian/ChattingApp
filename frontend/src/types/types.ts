@@ -13,6 +13,7 @@ export interface Conversation {
   participants?: User[];
   name: string;
   isGroup: boolean;
+  avatarUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
