@@ -9,9 +9,6 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 
 interface JwtPayload {
   sub: string;
-  email: string;
-  username: string;
-  createdAt: Date;
 }
 
 @Injectable()
@@ -41,9 +38,6 @@ export class AuthService {
     this.logger.log(`Authenticating user: ${user.username} (${user.id})`);
     const payload: JwtPayload = {
       sub: user.id,
-      email: user.email,
-      username: user.username,
-      createdAt: user.createdAt,
     };
     return {
       token: await this.jwtService.signAsync(payload),
@@ -63,5 +57,9 @@ export class AuthService {
       throw new BadRequestException('Invalid username or password');
     }
     return user;
+  }
+
+  async getMe(userId: string) {
+    return await this.userService.findOne(userId);
   }
 }

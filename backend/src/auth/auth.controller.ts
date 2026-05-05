@@ -14,7 +14,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('/register')
   register(@Body() registerDto: RegisterDto) {
@@ -30,7 +30,6 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('/me')
   getUserInfo(@Request() req) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-    return req.user;
+    return this.authService.getMe(req.user.id);
   }
 }
