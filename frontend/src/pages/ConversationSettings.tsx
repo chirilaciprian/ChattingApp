@@ -219,7 +219,7 @@ const ConversationSettings: React.FC = () => {
           >
             {saving ? <span className="loading loading-spinner" /> : 'Save Changes'}
           </button>
-          <button className="btn btn-ghost flex-1" onClick={() => navigate('/chat')}>
+          <button className="btn btn-neutral flex-1" onClick={() => navigate('/chat')}>
             Cancel
           </button>
         </div>

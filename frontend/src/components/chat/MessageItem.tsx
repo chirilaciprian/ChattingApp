@@ -42,14 +42,14 @@ const formatDividerDate = (dateString: string | Date) => {
   return `${date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}, ${timeStr}`;
 };
 
-const MessageItem: React.FC<MessageItemProps> = ({ message, currentUser, showAvatar = true, showDateDivider = true }) => {
+const MessageItem: React.FC<MessageItemProps> = ({ message, currentUser, showAvatar = true, showDateDivider = true, showUsername = false }) => {
   const isMe = message.createdBy.id === currentUser?.id;
   const messageTime = new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
     <>
       {showDateDivider && (
-        <div className="flex justify-center w-full mt-6 mb-2">
+        <div className="flex justify-center w-full">
           <span className="text-xs text-base-content/50 font-medium">{formatDividerDate(message.createdAt)}</span>
         </div>
       )}
@@ -63,8 +63,11 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, currentUser, showAva
             )}
           </div>
         )}
-        <div className="chat-header opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-[10px] h-0 overflow-visible text-base-content/50 select-none cursor-default">
-          <span className="relative -top-4">{messageTime}</span>
+        <div className="chat-header text-[10px] text-base-content/50 select-none cursor-default">
+          {!isMe && showUsername && (
+            <span className="font-semibold text-base-content/70">{message.createdBy.username}</span>
+          )}
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-1">{messageTime}</span>
         </div>
         <div className={`chat-bubble ${isMe ? 'bg-neutral text-neutral-content' : 'bg-base-200 text-base-content'}`}>
           {message.data}

@@ -97,8 +97,8 @@ const ChatWindow: React.FC = () => {
               const isMe = msg.createdBy.id === user?.id;
               let showAvatar = false;
               if (!isMe) {
-                const nextMsg = messages[index + 1];
-                if (!nextMsg || nextMsg.createdBy.id !== msg.createdBy.id) showAvatar = true;
+                const prevMsg2 = messages[index - 1];
+                if (!prevMsg2 || prevMsg2.createdBy.id !== msg.createdBy.id) showAvatar = true;
               }
               let showDateDivider = false;
               const prevMsg = messages[index - 1];
@@ -109,7 +109,7 @@ const ChatWindow: React.FC = () => {
                 if (timeDiff > 10 * 60 * 1000) showDateDivider = true;
               }
               return (
-                <MessageItem key={msg.id} message={msg} currentUser={user} showAvatar={showAvatar} showDateDivider={showDateDivider} />
+                <MessageItem key={msg.id} message={msg} currentUser={user} showAvatar={showAvatar} showDateDivider={showDateDivider} showUsername={showAvatar} />
               );
             })}
             <div ref={messagesEndRef} />
