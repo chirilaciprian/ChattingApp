@@ -95,8 +95,19 @@ export class UserService {
       .where('LOWER(user.username) LIKE LOWER(:username)', {
         username: `%${username.trim()}%`,
       })
-      .select(['user.id', 'user.username', 'user.email'])
+      .select(['user.id', 'user.username', 'user.email', 'user.avatarUrl'])
       .limit(20)
       .getMany();
+  }
+
+  async updateStatus(id: string, isOnline: boolean): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    user.isOnline = isOnline;
+    user.lastSeen = new Date();
+    const updatedUser = await this.userRepository.save(user);
+    return updatedUser;
   }
 }

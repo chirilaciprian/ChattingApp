@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { HiChatBubbleOvalLeft, HiPaperAirplane, HiEllipsisVertical, HiPencil } from 'react-icons/hi2';
+import { HiChatBubbleOvalLeft, HiPaperAirplane, HiPencil } from 'react-icons/hi2';
 import { useChat } from '../../context/chatContext';
 import { useAuth } from '../../context/authContext';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,19 @@ const ChatWindow: React.FC = () => {
     if (!inputValue.trim() || !activeConversation || !user) return;
     const res = await sendMessage({ data: inputValue, conversationId: activeConversation.id, userId: user.id });
     if (res.success) setInputValue('');
+  };
+
+  const formatLastSeen = (date?: Date | string) => {
+    if (!date) return 'Offline';
+    const d = new Date(date);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'Last seen just now';
+    if (diffMins < 60) return `Last seen ${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `Last seen ${diffHours}h ago`;
+    return `Last seen ${d.toLocaleDateString()}`;
   };
 
   if (!activeConversation) {
@@ -49,7 +62,16 @@ const ChatWindow: React.FC = () => {
                 ? activeConversation.name || 'Group'
                 : activeConversation.participants?.find(p => p.id !== user?.id)?.username || 'Conversation'}
             </h3>
-            <div className="text-xs text-success">Online</div>
+            {activeConversation.isGroup ? (
+              <div className="text-xs opacity-50">
+                {activeConversation.participants?.length ?? 0} members
+              </div>
+            ) : (() => {
+              const other = activeConversation.participants?.find(p => p.id !== user?.id);
+              return other?.isOnline
+                ? <div className="text-xs text-success font-medium">Online</div>
+                : <div className="text-xs opacity-50">{formatLastSeen(other?.lastSeen)}</div>;
+            })()}
           </div>
         </div>
 

@@ -4,6 +4,8 @@ export interface User {
   username: string;
   avatarUrl?: string;
   conversations: Conversation[];
+  isOnline?: boolean;
+  lastSeen?: Date;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -44,4 +46,10 @@ export interface UpdateConversationDto {
   name?: string | null;
   isGroup: boolean;
   avatarUrl?: string | null;
+}
+
+export interface UserStatusPayload {
+  userId: string;
+  isOnline: boolean;
+  lastSeen: Date;
 }

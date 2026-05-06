@@ -1,6 +1,6 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateUserDto } from './create-user.dto';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
     @ApiProperty({
@@ -29,4 +29,20 @@ export class UpdateUserDto {
     @IsOptional()
     @IsString()
     avatarUrl?: string;
+
+    @IsOptional()
+    @ApiProperty({
+        example: true,
+        description: 'User online status',
+    })
+    @IsBoolean()
+    isOnline: boolean;
+
+    @IsOptional()
+    @ApiProperty({
+        example: '2022-01-01T00:00:00.000Z',
+        description: 'User last seen',
+    })
+    @IsDate()
+    lastSeen: Date;
 }

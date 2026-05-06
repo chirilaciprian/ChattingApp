@@ -50,6 +50,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.debug(
         `Client connected: ${client.id} to room: user_${userId}`,
       );
+      const updatedUser = await this.chatService.updateUserStatus(userId, true);
+      this.server.emit('userStatusChanged', {
+        userId,
+        isOnline: true,
+        lastSeen: updatedUser.lastSeen,
+      });
     } catch (error) {
       this.logger.error(
         `Connection failed for client ${client.id}: ${error.message}`,
@@ -58,7 +64,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
+    const token = (client.handshake.auth?.token as string)?.split(' ')[1];
+    if (!token) {
+      throw new Error('No token provided');
+    }
+    const payload: JwtPayload = await this.jwtService.verifyAsync(token);
+    const userId = payload.sub;
+    const updatedUser = await this.chatService.updateUserStatus(userId, false);
+    this.server.emit('userStatusChanged', {
+      userId,
+      isOnline: false,
+      lastSeen: updatedUser.lastSeen,
+    });
     this.logger.debug(`Client disconnected: ${client.id}`);
   }
 

@@ -56,4 +56,12 @@ export class UserController {
   async remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return await this.userService.remove(id);
   }
+
+  @Patch('status/:id')
+  async updateStatus(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() body: { isOnline: boolean }
+  ) {
+    return await this.userService.updateStatus(id, body.isOnline);
+  }
 }

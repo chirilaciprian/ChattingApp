@@ -16,6 +16,7 @@ type SocketEventCallbacks = {
     onConversationCreated?: (conversation: Conversation) => void;
     onConversationDeleted?: (conversationId: string) => void;
     onConversationJoined?: (conversationId: string) => void;
+    onUserStatusChanged?: (payload: { userId: string; isOnline: boolean; lastSeen: Date }) => void;
     onConnectError?: (error: Error) => void;
 }
 
@@ -64,6 +65,10 @@ export const registerListeners = (callbacks: SocketEventCallbacks): void => {
 
     if (callbacks.onConversationJoined) {
         socket.on('conversationJoined', callbacks.onConversationJoined);
+    }
+
+    if (callbacks.onUserStatusChanged) {
+        socket.on('userStatusChanged', callbacks.onUserStatusChanged);
     }
 
     if (callbacks.onConnectError) {

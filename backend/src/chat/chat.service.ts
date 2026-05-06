@@ -5,12 +5,15 @@ import { Conversation } from 'src/conversation/entities/conversation.entity';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { Message } from 'src/message/entities/message.entity';
 import { MessageService } from 'src/message/message.service';
+import { User } from 'src/user/entities/user.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ChatService {
   constructor(
     private readonly conversationService: ConversationService,
     private readonly messageService: MessageService,
+    private readonly userService: UserService,
   ) { }
 
   async createConversation(
@@ -29,5 +32,9 @@ export class ChatService {
 
   async saveMessage(message: CreateMessageDto): Promise<Message> {
     return await this.messageService.create(message);
+  }
+
+  async updateUserStatus(userId: string, isOnline: boolean): Promise<User> {
+    return await this.userService.updateStatus(userId, isOnline);
   }
 }

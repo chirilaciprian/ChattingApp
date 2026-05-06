@@ -9,7 +9,7 @@ import type { Conversation, User } from '../types/types';
 import { toast } from 'react-toastify';
 import { getErrorMessage } from '../utils/errorHandler';
 import Avatar from '../components/common/Avatar';
-import { AVATARS } from '../utils/avatars';
+import { GROUP_AVATARS } from '../utils/groupAvatars';
 
 const ConversationSettings: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -240,7 +240,7 @@ const ConversationSettings: React.FC = () => {
                 <Avatar name={name || 'Group'} size="lg" />
               </div>
 
-              {AVATARS.map((url, idx) => (
+              {GROUP_AVATARS.map((url, idx) => (
                 <div
                   key={idx}
                   className={`cursor-pointer rounded-full p-1 border-2 transition-all ${avatarUrl === url ? 'border-primary scale-110 shadow-md' : 'border-transparent hover:border-base-300'}`}

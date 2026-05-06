@@ -51,6 +51,14 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
                     activeConversation?.id === conversationId ? [] : prev
                 )
             },
+            onUserStatusChanged: ({ userId, isOnline, lastSeen }) => {
+                setConversations(prev => prev.map(conv => ({
+                    ...conv,
+                    participants: conv.participants?.map(p =>
+                        p.id === userId ? { ...p, isOnline, lastSeen } : p
+                    ) ?? conv.participants
+                })))
+            },
             onConnectError: (err) => {
                 console.error('Socket connection error:', err.message)
             },
