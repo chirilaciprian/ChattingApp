@@ -10,6 +10,7 @@ import { Conversation } from './conversation/entities/conversation.entity';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { ParticipantModule } from './participant/participant.module';
+import { Participant } from './participant/entities/participant.entity';
 
 @Module({
   imports: [
@@ -21,17 +22,17 @@ import { ParticipantModule } from './participant/participant.module';
       username: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASSWORD || 'password',
       database: process.env.DB_NAME || 'chattingapp',
-      entities: [User, Message, Conversation],
+      entities: [User, Message, Conversation, Participant],
       synchronize: true,
     }),
     UserModule,
     MessageModule,
     ConversationModule,
+    ParticipantModule,
     AuthModule,
     ChatModule,
-    ParticipantModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

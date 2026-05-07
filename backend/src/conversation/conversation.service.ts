@@ -91,30 +91,11 @@ export class ConversationService {
     id: string,
     updateConversationDto: UpdateConversationDto,
   ): Promise<Conversation> {
-    const { participantIds, name, isGroup, avatarUrl } = updateConversationDto;
-    let participants: Participant[] | undefined;
-    if (participantIds) {
-      participants = await this.participantRepository.findBy({ id: In(participantIds) });
-      if (participants.length !== participantIds.length) {
-        throw new BadRequestException('One or more users not found');
-      }
-    }
-
-    const conversation = await this.conversationRepository.preload({
-      id,
-      participants: participants,
-      name: name,
-      isGroup: isGroup,
-      avatarUrl: avatarUrl,
-    });
-
+    const conversation = await this.conversationRepository.findOne({ where: { id } })
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
-    const updatedConversation =
-      await this.conversationRepository.save(conversation);
-    this.logger.log(`Conversation updated: ${updatedConversation.id}`);
-    return updatedConversation;
+    return await this.conversationRepository.save({ ...conversation, ...updateConversationDto });
   }
 
   async remove(id: string): Promise<Conversation> {

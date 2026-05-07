@@ -19,12 +19,13 @@ export class ChatService {
   async createConversation(
     conversation: CreateConversationDto,
   ): Promise<Conversation> {
-    return await this.conversationService.create({
+    const newConversation = await this.conversationService.create({
       participantIds: conversation.participantIds,
       isGroup: conversation.isGroup,
       name: conversation.name,
       createdBy: conversation.createdBy,
     });
+    return this.conversationService.findOne(newConversation.id);
   }
 
   async deleteConversation(conversationId: string): Promise<Conversation> {

@@ -152,7 +152,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         await this.chatService.createConversation(conversation);
       newConversation.participants.forEach((participant) => {
         this.server
-          .to(`user_${participant.id}`)
+          .to(`user_${participant.user.id}`)
           .emit('conversationCreated', newConversation);
       });
       return {
@@ -177,7 +177,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         await this.chatService.deleteConversation(conversationId);
       deletedConversation.participants.forEach((participant) => {
         this.server
-          .to(`user_${participant.id}`)
+          .to(`user_${participant.user.id}`)
           .emit('conversationDeleted', conversationId);
       });
       return { success: true };
