@@ -23,6 +23,7 @@ export class ChatService {
       participantIds: conversation.participantIds,
       isGroup: conversation.isGroup,
       name: conversation.name,
+      createdBy: conversation.createdBy,
     });
   }
 

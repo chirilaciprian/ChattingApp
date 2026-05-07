@@ -20,9 +20,9 @@ export class CreateMessageDto {
   data: string;
 
   @ApiProperty({
-    description: 'UUID of the user sending the message',
+    description: 'UUID of the participant sending the message',
     example: 'a5e1f1ee-6c54-4b01-90e6-d701748f0852',
   })
-  @IsUUID('all', { message: 'Invalid user ID' })
-  userId: string;
+  @IsUUID('all', { message: 'Invalid participant ID' })
+  participantId: string;
 }

@@ -9,8 +9,8 @@ import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Conversation } from './entities/conversation.entity';
 import { Repository, In } from 'typeorm';
+import { Participant } from 'src/participant/entities/participant.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Message } from 'src/message/entities/message.entity';
 
 @Injectable()
 export class ConversationService {
@@ -19,29 +19,39 @@ export class ConversationService {
   constructor(
     @InjectRepository(Conversation)
     private conversationRepository: Repository<Conversation>,
+    @InjectRepository(Participant)
+    private participantRepository: Repository<Participant>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    @InjectRepository(Message)
-    private messageRepository: Repository<Message>,
+
   ) { }
 
   async create(
     createConversationDto: CreateConversationDto,
   ): Promise<Conversation> {
-    const { participantIds } = createConversationDto;
-    const users = await this.userRepository.findBy({ id: In(participantIds) });
-    if (users.length !== participantIds.length) {
+    ;
+    const users = await this.userRepository.findBy({ id: In(createConversationDto.participantIds) });
+    if (users.length !== users.length) {
       throw new BadRequestException('One or more users not found');
     }
-    const conversation = this.conversationRepository.create({
-      participants: users,
-      isGroup: createConversationDto.isGroup,
-      name: createConversationDto.name,
+
+    return await this.conversationRepository.manager.transaction(async (manager) => {
+
+      const conversation = manager.create(Conversation, { name: createConversationDto.name, isGroup: createConversationDto.isGroup });
+      const savedConversation = await manager.save(Conversation, conversation);
+
+      const participants = users.map((user) =>
+        manager.create(Participant, {
+          user,
+          conversation: savedConversation,
+          role: user.id === createConversationDto.createdBy ? 'admin' : 'member',
+        }),
+      );
+      await manager.save(Participant, participants);
+
+      this.logger.log(`Conversation created: ${savedConversation.id}`);
+      return savedConversation;
     });
-    const savedConversation =
-      await this.conversationRepository.save(conversation);
-    this.logger.log(`Conversation created: ${savedConversation.id}`);
-    return savedConversation;
   }
 
   async findAll(): Promise<Conversation[]> {
@@ -64,8 +74,16 @@ export class ConversationService {
   async findByUserId(userId: string): Promise<Conversation[]> {
     return await this.conversationRepository
       .createQueryBuilder('conversation')
-      .innerJoin('conversation.participants', 'filterUser', 'filterUser.id = :userId', { userId })
-      .leftJoinAndSelect('conversation.participants', 'participants')
+      // JOIN only for filtering — don't select this
+      .innerJoin(
+        'conversation.participants',
+        'filterParticipant',
+        'filterParticipant.user.id = :userId',
+        { userId },
+      )
+      // Separate JOIN to load all participants
+      .leftJoinAndSelect('conversation.participants', 'participant')
+      .leftJoinAndSelect('participant.user', 'user')
       .getMany();
   }
 
@@ -74,20 +92,20 @@ export class ConversationService {
     updateConversationDto: UpdateConversationDto,
   ): Promise<Conversation> {
     const { participantIds, name, isGroup, avatarUrl } = updateConversationDto;
-    let users: User[] | undefined;
+    let participants: Participant[] | undefined;
     if (participantIds) {
-      users = await this.userRepository.findBy({ id: In(participantIds) });
-      if (users.length !== participantIds.length) {
+      participants = await this.participantRepository.findBy({ id: In(participantIds) });
+      if (participants.length !== participantIds.length) {
         throw new BadRequestException('One or more users not found');
       }
     }
 
     const conversation = await this.conversationRepository.preload({
       id,
-      ...(users && { participants: users }),
-      ...(name !== undefined && { name }),
-      ...(isGroup !== undefined && { isGroup }),
-      ...(avatarUrl !== undefined && { avatarUrl }),
+      participants: participants,
+      name: name,
+      isGroup: isGroup,
+      avatarUrl: avatarUrl,
     });
 
     if (!conversation) {
@@ -102,7 +120,7 @@ export class ConversationService {
   async remove(id: string): Promise<Conversation> {
     const conversation = await this.conversationRepository.findOneBy({ id });
     if (!conversation) {
-      throw new NotFoundException('Conversation nout found');
+      throw new NotFoundException('Conversation not found');
     }
     await this.conversationRepository.delete(id);
     this.logger.log(`Conversation deleted: ${conversation.id}`);

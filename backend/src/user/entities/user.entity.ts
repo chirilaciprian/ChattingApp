@@ -1,10 +1,11 @@
 import { Exclude } from 'class-transformer';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
+import { Participant } from 'src/participant/entities/participant.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -33,8 +34,8 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   lastSeen?: Date;
 
-  @ManyToMany(() => Conversation, (conversation) => conversation.participants)
-  conversations: Conversation[];
+  @OneToMany(() => Participant, (participant) => participant.user)
+  participants: Participant[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

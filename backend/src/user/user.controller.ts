@@ -14,9 +14,10 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 
+@ApiBearerAuth()
 @ApiTags('User')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard)

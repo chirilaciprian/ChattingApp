@@ -1,5 +1,5 @@
 import { Conversation } from 'src/conversation/entities/conversation.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Participant } from 'src/participant/entities/participant.entity';
 import {
   Column,
   CreateDateColumn,
@@ -17,9 +17,9 @@ export class Message {
   @Column()
   data: string;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => Participant, (participant) => participant.messages, { eager: true })
   @JoinColumn({ name: 'createdBy' })
-  createdBy: User;
+  createdBy: Participant;
 
   @ManyToOne(() => Conversation, (conversation) => conversation.messages)
   @JoinColumn({ name: 'conversationId' })

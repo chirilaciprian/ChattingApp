@@ -35,4 +35,13 @@ export class CreateConversationDto {
   @IsString()
   name: string;
 
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'ID of the user who created the conversation',
+    type: String,
+  })
+  @IsNotEmpty({ message: 'Created by is required' })
+  @IsUUID('all', { message: 'Enter valid uuid' })
+  createdBy: string;
+
 }

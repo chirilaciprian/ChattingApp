@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Message } from './entities/message.entity';
 import { Repository } from 'typeorm';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Participant } from 'src/participant/entities/participant.entity';
 
 @Injectable()
 export class MessageService {
@@ -13,26 +13,27 @@ export class MessageService {
 
   constructor(
     @InjectRepository(Message) private messageRepository: Repository<Message>,
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Participant) private participantRepository: Repository<Participant>,
     @InjectRepository(Conversation)
     private conversationRepository: Repository<Conversation>,
   ) { }
   async create(createMessageDto: CreateMessageDto): Promise<Message> {
-    const { userId, conversationId, data } = createMessageDto;
-    const createdBy = await this.userRepository.findOneBy({ id: userId });
+    const createdBy = await this.participantRepository.findOne({
+      where: { id: createMessageDto.participantId },
+    });
     if (!createdBy) {
-      throw new NotFoundException('User id not found');
+      throw new NotFoundException('Participant id not found');
     }
     const conversation = await this.conversationRepository.findOneBy({
-      id: conversationId,
+      id: createMessageDto.conversationId,
     });
     if (!conversation) {
       throw new NotFoundException('Conversation id not found');
     }
     const message = this.messageRepository.create({
-      data,
-      conversation,
-      createdBy,
+      data: createMessageDto.data,
+      conversation: conversation,
+      createdBy: createdBy,
     });
     const savedMessage = await this.messageRepository.save(message);
     this.logger.log(`Message created: ${savedMessage.id}`);
@@ -62,23 +63,22 @@ export class MessageService {
     id: string,
     updateMessageDto: UpdateMessageDto,
   ): Promise<Message> {
-    const { userId, conversationId, data, isRead } = updateMessageDto;
-    const createdBy = await this.userRepository.findOneBy({ id: userId });
+    const createdBy = await this.participantRepository.findOneBy({ id: updateMessageDto.participantId });
     if (!createdBy) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Participant id not found');
     }
     const conversation = await this.conversationRepository.findOneBy({
-      id: conversationId,
+      id: updateMessageDto.conversationId,
     });
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
     const message = await this.messageRepository.preload({
       id,
-      conversation,
-      createdBy,
-      data,
-      isRead,
+      conversation: conversation,
+      createdBy: createdBy,
+      data: updateMessageDto.data,
+      isRead: updateMessageDto.isRead,
     });
     if (!message) {
       throw new NotFoundException('Message not found');

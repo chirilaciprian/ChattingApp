@@ -1,11 +1,11 @@
 import { Message } from 'src/message/entities/message.entity';
+import { Participant } from 'src/participant/entities/participant.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinTable,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -16,9 +16,9 @@ export class Conversation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToMany(() => User, (user) => user.conversations)
+  @OneToMany(() => Participant, (participant) => participant.conversation)
   @JoinTable()
-  participants: User[];
+  participants: Participant[];
 
   @OneToMany(() => Message, (message) => message.conversation, {
     cascade: true,

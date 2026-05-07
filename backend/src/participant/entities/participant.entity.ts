@@ -1,6 +1,7 @@
 import { Conversation } from "src/conversation/entities/conversation.entity";
+import { Message } from "src/message/entities/message.entity";
 import { User } from "src/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Participant {
@@ -14,6 +15,9 @@ export class Participant {
     @ManyToOne(() => Conversation, (c) => c.participants)
     @JoinColumn({ name: 'conversationId' })
     conversation: Conversation;
+
+    @OneToMany(() => Message, (message) => message.createdBy, { cascade: true })
+    messages?: Message[];
 
     @Column({ type: 'timestamp', nullable: true })
     lastReadAt?: Date;
