@@ -9,6 +9,7 @@ import { Message } from './message/entities/message.entity';
 import { Conversation } from './conversation/entities/conversation.entity';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
+import { ParticipantModule } from './participant/participant.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ChatModule } from './chat/chat.module';
     ConversationModule,
     AuthModule,
     ChatModule,
+    ParticipantModule,
   ],
   controllers: [],
   providers: [],
