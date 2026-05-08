@@ -2,6 +2,17 @@
 
 Real-time chat application monorepo with React frontend and NestJS backend.
 
+## Live Demo
+
+Frontend:  
+https://chattingappcip.onrender.com
+
+Backend API:  
+https://chattingappapi-49bd.onrender.com/api
+
+> The backend is hosted on Render free tier, so the first request may take 30–60 seconds due to cold starts.
+
+---
 ## Tech Stack
 
 - **Frontend**: React 19, Vite, Tailwind CSS, Socket.io-client
