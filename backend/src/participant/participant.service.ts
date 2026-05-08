@@ -67,4 +67,27 @@ export class ParticipantService {
     this.logger.log(`Participant deleted with id : ${id} `)
     return participant;
   }
+
+  async incrementUnreadCount(id: string): Promise<Participant> {
+    const participant = await this.findOne(id);
+    if (!participant) {
+      throw new NotFoundException(`Participant with id ${id} not found`);
+    }
+    participant.unreadCount++;
+    await this.participantRepository.save(participant);
+    this.logger.log(`Participant with id: ${id} unread count incremented`);
+    return participant;
+  }
+
+  async resetUnreadCount(id: string): Promise<Participant> {
+    const participant = await this.findOne(id);
+    if (!participant) {
+      throw new NotFoundException(`Participant with id ${id} not found`);
+    }
+    participant.unreadCount = 0;
+    participant.lastReadAt = new Date();
+    await this.participantRepository.save(participant);
+    this.logger.log(`Participant with id: ${id} unread count reset`);
+    return participant;
+  }
 }

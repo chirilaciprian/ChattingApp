@@ -5,6 +5,8 @@ import { Conversation } from 'src/conversation/entities/conversation.entity';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { Message } from 'src/message/entities/message.entity';
 import { MessageService } from 'src/message/message.service';
+import { Participant } from 'src/participant/entities/participant.entity';
+import { ParticipantService } from 'src/participant/participant.service';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 
@@ -14,6 +16,7 @@ export class ChatService {
     private readonly conversationService: ConversationService,
     private readonly messageService: MessageService,
     private readonly userService: UserService,
+    private readonly participantService: ParticipantService,
   ) { }
 
   async createConversation(
@@ -39,4 +42,23 @@ export class ChatService {
   async updateUserStatus(userId: string, isOnline: boolean): Promise<User> {
     return await this.userService.updateStatus(userId, isOnline);
   }
+
+  async incrementUnreadCount(id: string): Promise<Participant> {
+    return await this.participantService.incrementUnreadCount(id);
+  }
+
+  async resetUnreadCount(conversationId: string, userId: string): Promise<void> {
+    const participants = await this.getConversationParticipants(conversationId);
+    const participant = participants.find(p => p.user.id === userId);
+    if (participant) {
+      await this.participantService.resetUnreadCount(participant.id);
+    }
+  }
+
+  async getConversationParticipants(conversationId: string): Promise<Participant[]> {
+    const conversation = await this.conversationService.findOne(conversationId);
+    return conversation.participants;
+  }
+
+
 }

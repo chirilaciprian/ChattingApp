@@ -97,6 +97,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server
       .to(message.conversationId)
       .emit('messageReceived', newMessage);
+    await this.notifyParticipants(message.conversationId, message.participantId);
     return {
       success: true,
       data: newMessage,
@@ -114,6 +115,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         `Client ${client.id} joined conversation: ${conversationId}`,
       );
       client.emit('conversationJoined', conversationId);
+      const token = (client.handshake.auth?.token as string)?.split(' ')[1];
+      const payload: JwtPayload = await this.jwtService.verifyAsync(token);
+      await this.chatService.resetUnreadCount(conversationId, payload.sub);
+      client.emit('unreadCountUpdated', { conversationId, unreadCount: 0 });
       return { success: true };
     } catch (error) {
       this.logger.error(`Failed to join conversation: ${error.message || 'Unknown error'}`,);
@@ -187,6 +192,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         success: false,
         error: error.message,
       }
+    }
+  }
+
+  private async notifyParticipants(conversationId: string, senderParticipantId: string): Promise<void> {
+    const participants = await this.chatService.getConversationParticipants(conversationId);
+
+    for (const participant of participants) {
+      if (participant.id === senderParticipantId) continue;
+
+      const userSockets = await this.server.in(`user_${participant.user.id}`).fetchSockets();
+      const isInConversation = userSockets.some(s => s.rooms.has(conversationId));
+      if (isInConversation) continue;
+
+      const updated = await this.chatService.incrementUnreadCount(participant.id);
+      this.server.to(`user_${participant.user.id}`).emit('unreadCountUpdated', {
+        conversationId,
+        unreadCount: updated.unreadCount,
+      });
     }
   }
 }

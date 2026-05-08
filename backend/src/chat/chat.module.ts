@@ -5,9 +5,10 @@ import { MessageModule } from 'src/message/message.module';
 import { ConversationModule } from 'src/conversation/conversation.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
+import { ParticipantModule } from 'src/participant/participant.module';
 
 @Module({
-  imports: [ConversationModule, MessageModule, AuthModule, UserModule],
+  imports: [ConversationModule, MessageModule, AuthModule, UserModule, ParticipantModule],
   providers: [ChatGateway, ChatService],
 })
 export class ChatModule { }
