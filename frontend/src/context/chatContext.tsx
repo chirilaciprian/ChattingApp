@@ -17,6 +17,7 @@ type ChatContextType = {
     sendMessage: (dto: CreateMessageDto) => ReturnType<typeof socketService.sendMessage>
     createConversation: typeof socketService.createConversation
     deleteConversation: typeof socketService.deleteConversation
+    unreadCounts: Record<string, number>
 }
 
 const ChatContext = createContext<ChatContextType | null>(null)
@@ -29,6 +30,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     const [activeConversation, setActiveConversationState] = useState<Conversation | null>(null)
     const [messages, setMessages] = useState<Message[]>([])
     const [messagesLoading, setMessagesLoading] = useState(false)
+    const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
 
     useEffect(() => {
         if (!token || !user) return
@@ -55,6 +57,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             onConnectError: (err) => {
                 console.error('Socket connection error:', err.message)
             },
+            onUnreadCountUpdated: ({ conversationId, unreadCount }) => {
+                setUnreadCounts(prev => ({ ...prev, [conversationId]: unreadCount }))
+            },
         })
 
         return () => {
@@ -64,11 +69,20 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [token, user])
 
-    // initial conversations fetch
+
     useEffect(() => {
         if (!user) return
         fetchConversationsByUserId(user.id)
-            .then(setConversations)
+            .then(convs => {
+                setConversations(convs)
+                // Seed unread counts from participant data
+                const counts: Record<string, number> = {}
+                convs.forEach(conv => {
+                    const me = conv.participants?.find(p => p.user.id === user.id)
+                    if (me) counts[conv.id] = me.unreadCount
+                })
+                setUnreadCounts(counts)
+            })
             .catch(console.error)
     }, [user])
 
@@ -118,6 +132,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             sendMessage,
             createConversation: socketService.createConversation,
             deleteConversation: socketService.deleteConversation,
+            unreadCounts
         }}>
             {children}
         </ChatContext.Provider>

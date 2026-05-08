@@ -61,6 +61,7 @@ export interface Participant {
   role: 'admin' | 'member';
   isMuted: boolean;
   joinedAt: Date;
+  unreadCount: number;
 }
 
 export interface CreateParticipantDto {

@@ -8,7 +8,7 @@ import CreateConversationModal from './CreateConversationModal';
 import Avatar from '../common/Avatar';
 
 const ConversationList: React.FC = () => {
-  const { conversations, activeConversation, setActiveConversation } = useChat();
+  const { conversations, activeConversation, setActiveConversation, unreadCounts } = useChat();
   const { user } = useAuth();
   const [modalMode, setModalMode] = useState<'none' | 'chat' | 'group'>('none');
 
@@ -78,6 +78,11 @@ const ConversationList: React.FC = () => {
                   <span className="font-bold truncate">{getConversationName(conv)}</span>
                   <span className="text-xs opacity-60 truncate">Click to chat</span>
                 </div>
+                {(unreadCounts[conv.id] ?? 0) > 0 && (
+                  <span className="badge badge-primary badge-sm shrink-0">
+                    {unreadCounts[conv.id] > 99 ? '99+' : unreadCounts[conv.id]}
+                  </span>
+                )}
               </button>
             ))}
           </div>
