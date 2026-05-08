@@ -14,42 +14,52 @@ export class ParticipantService {
     @InjectRepository(Participant) private participantRepository: Repository<Participant>
   ) { }
 
-  create(createParticipantDto: CreateParticipantDto): Promise<Participant> {
+  async create(createParticipantDto: CreateParticipantDto): Promise<Participant> {
     try {
-      const participant = this.participantRepository.create(createParticipantDto);
-      this.logger.log(`Participant created: ${JSON.stringify(participant)}`);
-      return this.participantRepository.save(participant);
+      const participant = this.participantRepository.create({
+        user: { id: createParticipantDto.userId } as any,
+        conversation: { id: createParticipantDto.conversationId } as any,
+        role: createParticipantDto.role ?? 'member',
+      });
+
+      const savedParticipant = await this.participantRepository.save(participant);
+
+      return await this.participantRepository.findOneOrFail({
+        where: { id: savedParticipant.id },
+        relations: ['user', 'conversation'], // explicitly load relations
+      });
+
     } catch (error) {
       this.logger.error(`Error creating participant: ${error}`);
       throw error;
     }
   }
 
-  findAll(): Promise<Participant[]> {
-    return this.participantRepository.find();
+  async findAll(): Promise<Participant[]> {
+    return await this.participantRepository.find();
   }
 
-  findOne(id: string): Promise<Participant | null> {
-    const participant = this.participantRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<Participant | null> {
+    const participant = await this.participantRepository.findOne({ where: { id } });
     if (!participant) {
       throw new NotFoundException(`Participant with id ${id} not found`);
     }
     return participant;
   }
 
-  update(id: string, updateParticipantDto: UpdateParticipantDto): Promise<Participant> {
-    const participant = this.participantRepository.findOne({ where: { id } })
+  async update(id: string, updateParticipantDto: UpdateParticipantDto): Promise<Participant> {
+    const participant = await this.participantRepository.findOne({ where: { id } })
     if (!participant) {
       throw new NotFoundException('Participant not found')
     }
     Object.assign(participant, updateParticipantDto)
-    const updatedParticipant = this.participantRepository.save(updateParticipantDto);
+    const updatedParticipant = await this.participantRepository.save(updateParticipantDto);
     this.logger.log(`Participant with id: ${id} updated`)
     return updatedParticipant;
   }
 
-  remove(id: string): Promise<Participant | null> {
-    const participant = this.participantRepository.findOne({ where: { id } })
+  async remove(id: string): Promise<Participant | null> {
+    const participant = await this.participantRepository.findOne({ where: { id } })
     if (!participant) {
       throw new NotFoundException('Participant not found')
     }

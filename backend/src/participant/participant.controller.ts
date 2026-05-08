@@ -15,8 +15,9 @@ import { ParticipantService } from './participant.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @ApiTags('Participant')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard)

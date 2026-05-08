@@ -44,18 +44,11 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
             onConversationCreated: (conversation) => {
                 setConversations(prev => [...prev, conversation])
             },
-            onConversationDeleted: (conversationId) => {
-                setConversations(prev => prev.filter(c => c.id !== conversationId))
-                setActiveConversationState(prev => prev?.id === conversationId ? null : prev)
-                setMessages(prev =>
-                    activeConversation?.id === conversationId ? [] : prev
-                )
-            },
             onUserStatusChanged: ({ userId, isOnline, lastSeen }) => {
                 setConversations(prev => prev.map(conv => ({
                     ...conv,
                     participants: conv.participants?.map(p =>
-                        p.id === userId ? { ...p, isOnline, lastSeen } : p
+                        p.user.id === userId ? { ...p, user: { ...p.user, isOnline, lastSeen } } : p
                     ) ?? conv.participants
                 })))
             },

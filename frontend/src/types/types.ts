@@ -12,7 +12,7 @@ export interface User {
 
 export interface Conversation {
   id: string;
-  participants?: User[];
+  participants?: Participant[];
   name: string;
   isGroup: boolean;
   avatarUrl?: string;
@@ -23,7 +23,7 @@ export interface Conversation {
 export interface Message {
   id: string;
   data: string;
-  createdBy: User;
+  createdBy: Participant;
   conversation: Conversation;
   isRead: boolean;
   createdAt: Date;
@@ -32,7 +32,7 @@ export interface Message {
 export interface CreateMessageDto {
   data: string;
   conversationId: string;
-  userId: string;
+  participantId: string;
 }
 
 export interface CreateConversationDto {
@@ -42,8 +42,7 @@ export interface CreateConversationDto {
 }
 
 export interface UpdateConversationDto {
-  participantIds: string[];
-  name?: string | null;
+  name: string;
   isGroup: boolean;
   avatarUrl?: string | null;
 }
@@ -52,4 +51,26 @@ export interface UserStatusPayload {
   userId: string;
   isOnline: boolean;
   lastSeen: Date;
+}
+
+export interface Participant {
+  id: string;
+  user: User;
+  conversationId?: string;
+  messages?: string[];
+  role: 'admin' | 'member';
+  isMuted: boolean;
+  joinedAt: Date;
+}
+
+export interface CreateParticipantDto {
+  userId: string;
+  conversationId: string;
+  role: 'admin' | 'member';
+}
+
+export interface UpdateParticipantDto {
+  role?: 'admin' | 'member';
+  isMuted?: boolean;
+  messages?: string[];
 }

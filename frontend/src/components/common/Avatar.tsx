@@ -1,17 +1,11 @@
 import React from 'react';
-
-interface Participant {
-  id: string | number;
-  avatarUrl?: string;
-  username?: string;
-}
+import type { Participant } from '../../types/types';
 
 interface AvatarProps {
   url?: string;
   name?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
   className?: string;
-  // Group avatar props
   isGroup?: boolean;
   participants?: Participant[];
   currentUserId?: string | number;
@@ -73,19 +67,19 @@ const Avatar: React.FC<AvatarProps> = ({
     return (
       <div className={`avatar-group -space-x-3 ${className}`}>
         {displayed.map((p) =>
-          p.avatarUrl ? (
-            <div key={p.id} className={`avatar`}>
+          p.user.avatarUrl ? (
+            <div key={p.user.id} className={`avatar`}>
               <div className={`${bubbleSizeClass} rounded-full`}>
-                <img src={p.avatarUrl} alt={p.username || 'Member'} />
+                <img src={p.user.avatarUrl} alt={p.user.username || 'Member'} />
               </div>
             </div>
           ) : (
-            <div key={p.id} className="avatar avatar-placeholder">
+            <div key={p.user.id} className="avatar avatar-placeholder">
               <div
                 className={`bg-neutral text-neutral-content rounded-full ${bubbleSizeClass}`}
               >
                 <span className={bubbleTextSizeClass}>
-                  {p.username ? p.username.charAt(0).toUpperCase() : '?'}
+                  {p.user.username ? p.user.username.charAt(0).toUpperCase() : '?'}
                 </span>
               </div>
             </div>

@@ -43,7 +43,7 @@ const formatDividerDate = (dateString: string | Date) => {
 };
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, currentUser, showAvatar = true, showDateDivider = true, showUsername = false }) => {
-  const isMe = message.createdBy.id === currentUser?.id;
+  const isMe = message.createdBy.user.id === currentUser?.id;
   const messageTime = new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
@@ -57,7 +57,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, currentUser, showAva
         {!isMe && (
           <div className="chat-image">
             {showAvatar ? (
-              <Avatar url={message.createdBy.avatarUrl} name={message.createdBy.username} size="sm" />
+              <Avatar url={message.createdBy.user.avatarUrl} name={message.createdBy.user.username} size="sm" />
             ) : (
               <div className="w-8" />
             )}
@@ -65,7 +65,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, currentUser, showAva
         )}
         <div className="chat-header text-[10px] text-base-content/50 select-none cursor-default">
           {!isMe && showUsername && (
-            <span className="font-semibold text-base-content/70">{message.createdBy.username}</span>
+            <span className="font-semibold text-base-content/70">{message.createdBy.user.username}</span>
           )}
           <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-1">{messageTime}</span>
         </div>

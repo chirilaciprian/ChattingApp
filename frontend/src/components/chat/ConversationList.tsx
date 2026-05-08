@@ -15,8 +15,8 @@ const ConversationList: React.FC = () => {
   const getConversationName = (conversation: Conversation) => {
     if (conversation.isGroup && conversation.name) return conversation.name;
     if (!conversation.isGroup && conversation.participants) {
-      const other = conversation.participants.filter(p => p.id !== user?.id);
-      if (other.length > 0) return other[0].username;
+      const other = conversation.participants.filter(p => p.user.id !== user?.id);
+      if (other.length > 0) return other[0].user.username;
     }
     return conversation.name || 'Conversation';
   };
@@ -68,7 +68,7 @@ const ConversationList: React.FC = () => {
                     />
                   ) : (
                     <Avatar
-                      url={conv.participants?.find(p => p.id !== user?.id)?.avatarUrl}
+                      url={conv.participants?.find(p => p.user.id !== user?.id)?.user.avatarUrl}
                       name={getConversationName(conv)}
                       size="lg"
                     />

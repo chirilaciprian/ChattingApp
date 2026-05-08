@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsIn, IsNumber, IsString, IsUUID } from "class-validator";
+import { IsIn, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class CreateParticipantDto {
     @ApiProperty({
@@ -20,8 +20,9 @@ export class CreateParticipantDto {
         description: 'Role of the participant',
         example: 'admin',
     })
+    @IsOptional()
     @IsString()
     @IsIn(['admin', 'member'])
-    role: 'admin' | 'member';
+    role?: 'admin' | 'member';
 
 }

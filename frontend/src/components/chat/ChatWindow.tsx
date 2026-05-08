@@ -5,10 +5,12 @@ import { useAuth } from '../../context/authContext';
 import { useNavigate } from 'react-router-dom';
 import MessageItem from './MessageItem';
 import Avatar from '../common/Avatar';
+import type { Participant } from '../../types/types';
 
 const ChatWindow: React.FC = () => {
   const { messages, sendMessage, activeConversation, messagesLoading } = useChat();
   const { user } = useAuth();
+  const [participant, setParticipant] = useState<Participant | undefined>(undefined)
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -18,8 +20,8 @@ const ChatWindow: React.FC = () => {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim() || !activeConversation || !user) return;
-    const res = await sendMessage({ data: inputValue, conversationId: activeConversation.id, userId: user.id });
+    if (!inputValue.trim() || !activeConversation || !participant) return;
+    const res = await sendMessage({ data: inputValue, conversationId: activeConversation.id, participantId: participant.id });
     if (res.success) setInputValue('');
   };
 
@@ -36,6 +38,13 @@ const ChatWindow: React.FC = () => {
     return `Last seen ${d.toLocaleDateString()}`;
   };
 
+  useEffect(() => {
+    if (!activeConversation) return;
+    const p = activeConversation.participants?.find(p => p.user.id === user?.id);
+    console.log(p);
+    setParticipant(p);
+  }, [activeConversation])
+
   if (!activeConversation) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-base-100 opacity-50">
@@ -51,23 +60,23 @@ const ChatWindow: React.FC = () => {
       <div className="p-4 border-b border-base-300 flex items-center justify-between bg-base-100/80 backdrop-blur z-10">
         <div className="flex items-center gap-3">
           <Avatar
-            url={activeConversation.isGroup ? activeConversation.avatarUrl : activeConversation.participants?.find(p => p.id !== user?.id)?.avatarUrl}
+            url={activeConversation.isGroup ? activeConversation.avatarUrl : activeConversation.participants?.find(p => p.user.id !== user?.id)?.user.avatarUrl}
             name={activeConversation.isGroup
               ? activeConversation.name || 'Group'
-              : activeConversation.participants?.find(p => p.id !== user?.id)?.username || 'Conversation'}
+              : activeConversation.participants?.find(p => p.user.id !== user?.id)?.user.username || 'Conversation'}
           />
           <div>
             <h3 className="font-bold">
               {activeConversation.isGroup
                 ? activeConversation.name || 'Group'
-                : activeConversation.participants?.find(p => p.id !== user?.id)?.username || 'Conversation'}
+                : activeConversation.participants?.find(p => p.user.id !== user?.id)?.user.username || 'Conversation'}
             </h3>
             {activeConversation.isGroup ? (
               <div className="text-xs opacity-50">
                 {activeConversation.participants?.length ?? 0} members
               </div>
             ) : (() => {
-              const other = activeConversation.participants?.find(p => p.id !== user?.id);
+              const other = activeConversation.participants?.find(p => p.user.id !== user?.id)?.user;
               return other?.isOnline
                 ? <div className="text-xs text-success font-medium">Online</div>
                 : <div className="text-xs opacity-50">{formatLastSeen(other?.lastSeen)}</div>;
