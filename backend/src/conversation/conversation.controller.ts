@@ -18,15 +18,17 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { Conversation } from './entities/conversation.entity';
 import { AuthGuard } from 'src/common/guards/auth.guard';
+import { ApiKeyGuard } from 'src/common/guards/apikey,guard';
 
 @ApiBearerAuth()
+@UseGuards(AuthGuard)
 @ApiTags('Conversation')
 @UseInterceptors(ClassSerializerInterceptor)
-@UseGuards(AuthGuard)
 @Controller('conversation')
 export class ConversationController {
-  constructor(private readonly conversationService: ConversationService) {}
+  constructor(private readonly conversationService: ConversationService) { }
 
+  @UseGuards(ApiKeyGuard)
   @Post()
   async create(@Body() createConversationDto: CreateConversationDto) {
     const conversation = await this.conversationService.create(
@@ -35,6 +37,7 @@ export class ConversationController {
     return plainToInstance(Conversation, conversation);
   }
 
+  @UseGuards(ApiKeyGuard)
   @Get()
   async findAll() {
     const conversations = await this.conversationService.findAll();
@@ -53,6 +56,7 @@ export class ConversationController {
     return conversations;
   }
 
+
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -65,6 +69,7 @@ export class ConversationController {
     return plainToInstance(Conversation, conversation);
   }
 
+  @UseGuards(ApiKeyGuard)
   @Delete(':id')
   async remove(@Param('id', new ParseUUIDPipe()) id: string) {
     const conversation = await this.conversationService.remove(id);

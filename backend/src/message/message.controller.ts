@@ -18,6 +18,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { Message } from './entities/message.entity';
 import { AuthGuard } from 'src/common/guards/auth.guard';
+import { ApiKeyGuard } from 'src/common/guards/apikey,guard';
 
 @ApiBearerAuth()
 @ApiTags('Message')
@@ -25,14 +26,16 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 @UseGuards(AuthGuard)
 @Controller('message')
 export class MessageController {
-  constructor(private readonly messageService: MessageService) {}
+  constructor(private readonly messageService: MessageService) { }
 
+  @UseGuards(ApiKeyGuard)
   @Post()
   async create(@Body() createMessageDto: CreateMessageDto) {
     const message = await this.messageService.create(createMessageDto);
     return plainToInstance(Message, message);
   }
 
+  @UseGuards(ApiKeyGuard)
   @Get()
   async findAll() {
     const messages = await this.messageService.findAll();

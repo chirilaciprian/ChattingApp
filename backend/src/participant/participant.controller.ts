@@ -16,6 +16,7 @@ import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiKeyGuard } from 'src/common/guards/apikey,guard';
 
 @ApiBearerAuth()
 @ApiTags('Participant')
@@ -30,6 +31,7 @@ export class ParticipantController {
     return this.participantService.create(createParticipantDto);
   }
 
+  @UseGuards(ApiKeyGuard)
   @Get()
   findAll() {
     return this.participantService.findAll();

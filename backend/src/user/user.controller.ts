@@ -16,6 +16,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/common/guards/auth.guard';
+import { ApiKeyGuard } from 'src/common/guards/apikey,guard';
 
 @ApiBearerAuth()
 @ApiTags('User')
@@ -25,16 +26,19 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
+  @UseGuards(ApiKeyGuard)
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.userService.create(createUserDto);
   }
 
+  @UseGuards(ApiKeyGuard)
   @Get()
   async findAll() {
     return await this.userService.findAll();
   }
 
+  @UseGuards(ApiKeyGuard)
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return await this.userService.findOne(id);
@@ -53,6 +57,7 @@ export class UserController {
     return await this.userService.update(id, updateUserDto);
   }
 
+  @UseGuards(ApiKeyGuard)
   @Delete(':id')
   async remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return await this.userService.remove(id);
