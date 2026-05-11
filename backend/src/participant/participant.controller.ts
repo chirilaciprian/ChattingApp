@@ -15,10 +15,11 @@ import { ParticipantService } from './participant.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/update-participant.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ApiKeyGuard } from 'src/common/guards/apikey,guard';
 
 @ApiBearerAuth()
+@ApiSecurity('x-api-key')
 @ApiTags('Participant')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard)

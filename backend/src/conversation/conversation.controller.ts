@@ -14,13 +14,14 @@ import {
 import { ConversationService } from './conversation.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { Conversation } from './entities/conversation.entity';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { ApiKeyGuard } from 'src/common/guards/apikey,guard';
 
 @ApiBearerAuth()
+@ApiSecurity('x-api-key')
 @UseGuards(AuthGuard)
 @ApiTags('Conversation')
 @UseInterceptors(ClassSerializerInterceptor)

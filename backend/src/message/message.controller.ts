@@ -14,13 +14,14 @@ import {
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { plainToInstance } from 'class-transformer';
 import { Message } from './entities/message.entity';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { ApiKeyGuard } from 'src/common/guards/apikey,guard';
 
 @ApiBearerAuth()
+@ApiSecurity('x-api-key')
 @ApiTags('Message')
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(AuthGuard)
